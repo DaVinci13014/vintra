@@ -17,7 +17,9 @@ export function PasswordRules({ password }: PasswordRulesProps) {
         return (
           <li
             key={rule.label}
-            className={isValid ? "flex items-center gap-2 text-brand" : "flex items-center gap-2 text-muted"}
+            className={
+              isValid ? "flex items-center gap-2 text-brand" : "flex items-center gap-2 text-muted"
+            }
           >
             <Check aria-hidden="true" size={14} />
             {rule.label}

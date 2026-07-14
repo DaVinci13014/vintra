@@ -5,13 +5,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { Button, Field, Input } from "@/shared/ui";
-import {
-  forgotPasswordSchema,
-  type ForgotPasswordValues,
-} from "../model/auth-schemas";
+import { authClient } from "../api/auth-client";
+import { forgotPasswordSchema, type ForgotPasswordValues } from "../model/auth-schemas";
 
 export function ForgotPasswordForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -21,7 +20,19 @@ export function ForgotPasswordForm() {
     mode: "onChange",
   });
 
-  async function onSubmit() {
+  async function onSubmit(values: ForgotPasswordValues) {
+    setSubmissionError(null);
+
+    const { error } = await authClient.requestPasswordReset({
+      email: values.email,
+      redirectTo: `${window.location.origin}/reinitialiser-mot-de-passe`,
+    });
+
+    if (error?.code === "TOO_MANY_REQUESTS") {
+      setSubmissionError("Trop de demandes. Réessayez dans quelques instants.");
+      return;
+    }
+
     setIsSubmitted(true);
   }
 
@@ -39,8 +50,19 @@ export function ForgotPasswordForm() {
         />
       </Field>
       {isSubmitted && (
-        <p className="rounded-xl border border-border bg-surface p-3 text-sm text-secondary-text" role="status">
-          L’adresse est valide. L’envoi sécurisé sera activé à l’étape 3.
+        <p
+          className="rounded-xl border border-border bg-surface p-3 text-sm text-secondary-text"
+          role="status"
+        >
+          Si cette adresse est associée à un compte, un lien vient d’être envoyé.
+        </p>
+      )}
+      {submissionError && (
+        <p
+          className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
+          role="alert"
+        >
+          {submissionError}
         </p>
       )}
       <Button type="submit" size="lg" disabled={!isValid || isSubmitting}>

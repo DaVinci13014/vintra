@@ -2,28 +2,34 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { SignUpForm } from "@/features/auth";
+import { VerificationEmailPanel } from "@/features/auth";
 import { getSession } from "@/features/auth/server";
 import { Button } from "@/shared/ui";
 import { AuthLayout } from "@/widgets/auth";
 
-export const metadata: Metadata = { title: "Inscription" };
+export const metadata: Metadata = { title: "Vérification email" };
 
-export default async function SignUpPage() {
+type VerificationEmailPageProps = {
+  searchParams: Promise<{ email?: string }>;
+};
+
+export default async function VerificationEmailPage({ searchParams }: VerificationEmailPageProps) {
   const session = await getSession();
   if (session) redirect("/onboarding");
 
+  const { email } = await searchParams;
+
   return (
     <AuthLayout
-      title="Créez votre espace."
-      description="Quelques informations suffisent pour commencer. L’analyse financière vient ensuite."
+      title="Vérifiez votre adresse email."
+      description="Nous venons d’envoyer un lien de confirmation."
       alternateAction={
         <Button asChild variant="secondary">
           <Link href="/connexion">Se connecter</Link>
         </Button>
       }
     >
-      <SignUpForm />
+      <VerificationEmailPanel email={email} />
     </AuthLayout>
   );
 }

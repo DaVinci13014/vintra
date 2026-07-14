@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 import { SignInForm } from "@/features/auth";
+import { getSession } from "@/features/auth/server";
 import { Button } from "@/shared/ui";
 import { AuthLayout } from "@/widgets/auth";
 
 export const metadata: Metadata = { title: "Connexion" };
 
-export default function SignInPage() {
+export default async function SignInPage() {
+  const session = await getSession();
+  if (session) redirect("/onboarding");
+
   return (
     <AuthLayout
       title="Heureux de vous revoir."

@@ -6,6 +6,7 @@ const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
 export const signInSchema = z.object({
   email: z.string().trim().toLowerCase().email("Veuillez saisir une adresse email valide."),
   password: z.string().min(1, "Veuillez saisir votre mot de passe."),
+  rememberMe: z.boolean(),
 });
 
 export const forgotPasswordSchema = z.object({
@@ -30,10 +31,22 @@ export const signUpSchema = z
     password: z
       .string()
       .min(8, "Le mot de passe doit contenir au moins 8 caractères.")
-      .regex(
-        PASSWORD_PATTERN,
-        "Ajoutez une majuscule, une minuscule et un chiffre.",
-      ),
+      .max(128, "Le mot de passe ne peut pas dépasser 128 caractères.")
+      .regex(PASSWORD_PATTERN, "Ajoutez une majuscule, une minuscule et un chiffre."),
+    confirmPassword: z.string().min(1, "Veuillez confirmer votre mot de passe."),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Les mots de passe ne correspondent pas.",
+  });
+
+export const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Le mot de passe doit contenir au moins 8 caractères.")
+      .max(128, "Le mot de passe ne peut pas dépasser 128 caractères.")
+      .regex(PASSWORD_PATTERN, "Ajoutez une majuscule, une minuscule et un chiffre."),
     confirmPassword: z.string().min(1, "Veuillez confirmer votre mot de passe."),
   })
   .refine((values) => values.password === values.confirmPassword, {
@@ -44,3 +57,4 @@ export const signUpSchema = z
 export type SignInValues = z.infer<typeof signInSchema>;
 export type SignUpValues = z.infer<typeof signUpSchema>;
 export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;

@@ -1,4 +1,5 @@
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 
@@ -15,6 +16,45 @@ export const auth = betterAuth({
   secret: serverEnv.BETTER_AUTH_SECRET,
   trustedOrigins: [serverEnv.BETTER_AUTH_URL],
   database: prismaAdapter(prisma, { provider: "postgresql" }),
+  hooks: {
+    before: createAuthMiddleware(async (context) => {
+      if (context.path !== "/sign-up/email") {
+        return;
+      }
+
+      const email =
+        typeof context.body?.email === "string" ? context.body.email.trim().toLowerCase() : null;
+
+      if (!email) {
+        return;
+      }
+
+      const existingUser = await prisma.user.findUnique({
+        where: { email },
+        select: { id: true },
+      });
+
+      if (existingUser) {
+        throw new APIError("UNPROCESSABLE_ENTITY", {
+          code: "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL",
+          message: "Cette adresse email est déjà utilisée.",
+        });
+      }
+    }),
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          await prisma.profile.upsert({
+            where: { userId: user.id },
+            update: {},
+            create: { userId: user.id },
+          });
+        },
+      },
+    },
+  },
   advanced: {
     database: {
       generateId: "uuid",

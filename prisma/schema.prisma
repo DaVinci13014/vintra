@@ -82,6 +82,7 @@ model Profile {
   incomeType            IncomeType?
   incomeFrequency       IncomeFrequency?
   monthlyIncome         Decimal?              @db.Decimal(14, 2)
+  hasAdditionalIncome   Boolean?
   additionalIncome      Decimal?              @db.Decimal(14, 2)
   housingExpense        Decimal?              @db.Decimal(14, 2)
   foodExpense           Decimal?              @db.Decimal(14, 2)
