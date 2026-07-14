@@ -1,0 +1,315 @@
+generator client {
+  provider   = "prisma-client"
+  output     = "../src/shared/api/generated/prisma"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String
+  firstName     String
+  lastName      String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  profile       Profile?
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(uuid()) @db.Uuid
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Account {
+  id                    String    @id @default(uuid()) @db.Uuid
+  accountId             String
+  providerId            String
+  userId                String    @db.Uuid
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Verification {
+  id         String    @id @default(uuid()) @db.Uuid
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  @@index([identifier])
+  @@map("verifications")
+}
+
+model Profile {
+  id                    String                @id @default(uuid()) @db.Uuid
+  userId                String                @unique @db.Uuid
+  birthDate             DateTime?             @db.Date
+  country               String?
+  currency              String                @default("EUR")
+  profession            Profession?
+  incomeType            IncomeType?
+  incomeFrequency       IncomeFrequency?
+  monthlyIncome         Decimal?              @db.Decimal(14, 2)
+  additionalIncome      Decimal?              @db.Decimal(14, 2)
+  housingExpense        Decimal?              @db.Decimal(14, 2)
+  foodExpense           Decimal?              @db.Decimal(14, 2)
+  transportExpense      Decimal?              @db.Decimal(14, 2)
+  restaurantExpense     Decimal?              @db.Decimal(14, 2)
+  shoppingExpense       Decimal?              @db.Decimal(14, 2)
+  hobbyExpense          Decimal?              @db.Decimal(14, 2)
+  subscriptionExpense   Decimal?              @db.Decimal(14, 2)
+  impulsePurchase       Frequency?
+  bankCheckFrequency    BankCheckFrequency?
+  hasBudget             Boolean?
+  budgetCompliance      Frequency?
+  installmentUsage      InstallmentFrequency?
+  endOfMonthDifficulty  EndOfMonthFrequency?
+  hasSavings            Boolean?
+  currentSavings        Decimal?              @db.Decimal(14, 2)
+  monthlySavings        Decimal?              @db.Decimal(14, 2)
+  goalReason            String?
+  goalTargetAmount      Decimal?              @db.Decimal(14, 2)
+  goalTargetDate        DateTime?             @db.Date
+  goalPriority          Int?
+  currentOnboardingStep Int                   @default(1)
+  onboardingCompleted   Boolean               @default(false)
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  financialProfiles     FinancialProfile[]
+  goals                 Goal[]
+  savingPlans           SavingPlan[]
+  recommendations       Recommendation[]
+
+  @@index([country])
+  @@index([profession])
+  @@map("profiles")
+}
+
+model FinancialProfile {
+  id                   String               @id @default(uuid()) @db.Uuid
+  profileId            String               @db.Uuid
+  profileType          FinancialProfileType
+  budgetScore          Int
+  savingScore          Int
+  disciplineScore      Int
+  financialHealthScore Int
+  monthlyIncome        Decimal              @db.Decimal(14, 2)
+  monthlyExpenses      Decimal              @db.Decimal(14, 2)
+  savingCapacity       Decimal              @db.Decimal(14, 2)
+  savingRate           Decimal              @db.Decimal(7, 2)
+  remainingBudget      Decimal              @db.Decimal(14, 2)
+  createdAt            DateTime             @default(now())
+  profile              Profile              @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, createdAt])
+  @@map("financial_profiles")
+}
+
+model Goal {
+  id            String     @id @default(uuid()) @db.Uuid
+  profileId     String     @db.Uuid
+  title         String
+  description   String?
+  targetAmount  Decimal    @db.Decimal(14, 2)
+  currentAmount Decimal    @default(0) @db.Decimal(14, 2)
+  targetDate    DateTime   @db.Date
+  progress      Decimal    @default(0) @db.Decimal(7, 2)
+  status        GoalStatus @default(ACTIVE)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  profile       Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, status])
+  @@map("goals")
+}
+
+model SavingPlan {
+  id                       String               @id @default(uuid()) @db.Uuid
+  profileId                String               @db.Uuid
+  recommendedMonthlySaving Decimal              @db.Decimal(14, 2)
+  estimatedCompletionDate  DateTime?            @db.Date
+  difficulty               SavingPlanDifficulty
+  progress                 Decimal              @default(0) @db.Decimal(7, 2)
+  status                   SavingPlanStatus     @default(ACTIVE)
+  milestones               Json
+  createdAt                DateTime             @default(now())
+  updatedAt                DateTime             @updatedAt
+  profile                  Profile              @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, status])
+  @@map("saving_plans")
+}
+
+model Recommendation {
+  id              String                   @id @default(uuid()) @db.Uuid
+  profileId       String                   @db.Uuid
+  title           String
+  description     String
+  category        RecommendationCategory
+  priority        RecommendationPriority
+  impact          RecommendationImpact
+  difficulty      RecommendationDifficulty
+  potentialSaving Decimal                  @default(0) @db.Decimal(14, 2)
+  status          RecommendationStatus     @default(GENERATED)
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  profile         Profile                  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, status, priority])
+  @@map("recommendations")
+}
+
+enum Profession {
+  EMPLOYEE
+  FREELANCER
+  ENTREPRENEUR
+  STUDENT
+  UNEMPLOYED
+  RETIRED
+}
+
+enum IncomeType {
+  SALARY
+  BUSINESS
+  BENEFITS
+  PENSION
+  MULTIPLE
+}
+
+enum IncomeFrequency {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+  VARIABLE
+}
+
+enum Frequency {
+  NEVER
+  RARELY
+  SOMETIMES
+  OFTEN
+  VERY_OFTEN
+  ALWAYS
+}
+
+enum BankCheckFrequency {
+  DAILY
+  SEVERAL_TIMES_A_WEEK
+  WEEKLY
+  A_FEW_TIMES_A_MONTH
+  RARELY
+}
+
+enum InstallmentFrequency {
+  NEVER
+  RARELY
+  SOMETIMES
+  OFTEN
+}
+
+enum EndOfMonthFrequency {
+  NEVER
+  RARELY
+  SOMETIMES
+  OFTEN
+  EVERY_MONTH
+}
+
+enum FinancialProfileType {
+  SAVER
+  BALANCED
+  SPENDER
+  FRAGILE
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum SavingPlanDifficulty {
+  EASY
+  NORMAL
+  CHALLENGING
+  UNREALISTIC
+}
+
+enum SavingPlanStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum RecommendationCategory {
+  INCOME
+  EXPENSES
+  SAVINGS
+  HABITS
+  GOAL
+  PROFILE
+}
+
+enum RecommendationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum RecommendationImpact {
+  VERY_LOW
+  LOW
+  MEDIUM
+  HIGH
+  VERY_HIGH
+}
+
+enum RecommendationDifficulty {
+  VERY_EASY
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum RecommendationStatus {
+  GENERATED
+  DISPLAYED
+  OPENED
+  APPLIED
+  ARCHIVED
+}
