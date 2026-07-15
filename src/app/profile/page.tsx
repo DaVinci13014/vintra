@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { requireSession } from "@/features/auth/server";
 import { getEditableFinancialProfile } from "@/features/financial-profile";
-import { FinancialProfileForm } from "@/features/financial-profile/ui/financial-profile-form";
+import { FinancialProfileForm } from "@/features/financial-profile/ui";
 import { GoalsLayout } from "@/widgets/goals";
 
 export default async function ProfilePage() {

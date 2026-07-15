@@ -27,13 +27,21 @@ export function SavingsHistoryChart({
   );
 
   return (
-    <section className="rounded-3xl border border-border bg-surface p-5 sm:p-7" aria-labelledby="history-title">
+    <section
+      className="rounded-3xl border border-border bg-surface p-5 sm:p-7"
+      aria-labelledby="history-title"
+    >
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <p className="text-sm text-brand">Votre progression</p>
-          <h2 id="history-title" className="mt-1 text-xl font-semibold">Évolution de l’épargne</h2>
+          <h2 id="history-title" className="mt-1 text-xl font-semibold">
+            Évolution de l’épargne
+          </h2>
         </div>
-        <div className="flex rounded-xl border border-border bg-card p-1" aria-label="Période du graphique">
+        <div
+          className="flex rounded-xl border border-border bg-card p-1"
+          aria-label="Période du graphique"
+        >
           {([1, 3, 6, 12] as const).map((value) => (
             <button
               key={value}
@@ -54,12 +62,17 @@ export function SavingsHistoryChart({
             <PiggyBank className="mx-auto text-brand" size={28} aria-hidden="true" />
             <h3 className="mt-4 font-semibold">Votre historique commence ici</h3>
             <p className="mt-2 text-sm leading-6 text-secondary-text">
-              Une deuxième mise à jour de votre épargne permettra d’afficher son évolution dans le temps.
+              Une deuxième mise à jour de votre épargne permettra d’afficher son évolution dans le
+              temps.
             </p>
           </div>
         </div>
       ) : (
-        <div className="mt-6 h-64 w-full" role="img" aria-label="Courbe d’évolution de votre épargne">
+        <div
+          className="mt-6 h-64 w-full"
+          role="img"
+          aria-label="Courbe d’évolution de votre épargne"
+        >
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={visibleData} margin={{ top: 8, right: 4, bottom: 0, left: 4 }}>
               <XAxis
@@ -88,7 +101,12 @@ export function SavingsHistoryChart({
                 strokeWidth={3}
                 fill="var(--brand)"
                 fillOpacity={0.12}
-                activeDot={{ r: 5, fill: "var(--brand)", stroke: "var(--background)", strokeWidth: 2 }}
+                activeDot={{
+                  r: 5,
+                  fill: "var(--brand)",
+                  stroke: "var(--background)",
+                  strokeWidth: 2,
+                }}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -111,5 +129,9 @@ function formatAxisDate(value: string) {
 }
 
 function formatFullDate(value: string) {
-  return new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" }).format(new Date(value));
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(value));
 }

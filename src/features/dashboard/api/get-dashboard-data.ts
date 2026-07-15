@@ -47,7 +47,7 @@ export async function getDashboardData(userId: string) {
         },
       },
       recommendations: {
-        where: { status: { not: "ARCHIVED" } },
+        where: { status: { in: ["GENERATED", "DISPLAYED", "OPENED"] } },
         select: {
           id: true,
           title: true,

@@ -40,8 +40,18 @@ export function AuthLayout({ title, description, alternateAction, children }: Au
         <div aria-hidden="true" className="absolute inset-0">
           <div className="absolute left-1/2 top-1/2 size-[520px] -translate-x-1/2 -translate-y-1/2 rounded-[96px] border border-divider" />
           <div className="absolute left-1/2 top-1/2 size-[360px] -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[72px] border border-divider" />
-          <svg className="absolute left-1/2 top-1/2 w-[420px] -translate-x-1/2 -translate-y-1/2 text-foreground" viewBox="0 0 36 36" fill="none">
-            <path d="M8.5 24.3L17.7697 9L27.5 27L8.5 24.3ZM17.7697 9L23.2394 19.2937L8.5 24.3M12.1273 20.025L20.463 26" stroke="currentColor" strokeWidth="0.35" strokeLinecap="round" strokeLinejoin="round" />
+          <svg
+            className="absolute left-1/2 top-1/2 w-[420px] -translate-x-1/2 -translate-y-1/2 text-foreground"
+            viewBox="0 0 36 36"
+            fill="none"
+          >
+            <path
+              d="M8.5 24.3L17.7697 9L27.5 27L8.5 24.3ZM17.7697 9L23.2394 19.2937L8.5 24.3M12.1273 20.025L20.463 26"
+              stroke="currentColor"
+              strokeWidth="0.35"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </div>
 
@@ -51,7 +61,8 @@ export function AuthLayout({ title, description, alternateAction, children }: Au
             Un plan clair, construit autour de votre réalité.
           </p>
           <p className="mt-5 max-w-md leading-7 text-secondary-text">
-            Vintra transforme quelques informations simples en une trajectoire d’épargne compréhensible.
+            Vintra transforme quelques informations simples en une trajectoire d’épargne
+            compréhensible.
           </p>
         </div>
       </aside>

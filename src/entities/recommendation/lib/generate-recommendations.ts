@@ -1,7 +1,4 @@
-import type {
-  GeneratedRecommendation,
-  RecommendationContext,
-} from "../model/recommendation";
+import type { GeneratedRecommendation, RecommendationContext } from "../model/recommendation";
 
 export function generateRecommendations({
   input,
@@ -27,10 +24,9 @@ export function generateRecommendations({
     ["shopping", input.shoppingExpense],
     ["loisirs", input.hobbyExpense],
   ] as const;
-  const [largestLabel, largestAmount] = [...discretionary].sort((left, right) => right[1] - left[1])[0] ?? [
-    "dépenses variables",
-    0,
-  ];
+  const [largestLabel, largestAmount] = [...discretionary].sort(
+    (left, right) => right[1] - left[1],
+  )[0] ?? ["dépenses variables", 0];
   const discretionaryTotal = discretionary.reduce((total, [, amount]) => total + amount, 0);
   if (analysis.monthlyIncome > 0 && discretionaryTotal / analysis.monthlyIncome >= 0.15) {
     const potentialSaving = money(largestAmount * 0.2);
@@ -45,7 +41,10 @@ export function generateRecommendations({
     });
   }
 
-  if (input.subscriptionExpense >= 50 || input.subscriptionExpense / analysis.monthlyIncome >= 0.03) {
+  if (
+    input.subscriptionExpense >= 50 ||
+    input.subscriptionExpense / analysis.monthlyIncome >= 0.03
+  ) {
     const potentialSaving = money(input.subscriptionExpense * 0.2);
     recommendations.push({
       title: "Faire le tri dans vos abonnements",

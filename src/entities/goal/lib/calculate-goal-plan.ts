@@ -16,21 +16,33 @@ export function calculateGoalPlan(input: GoalPlanInput, now = new Date()) {
   const availableMonths = Math.max(1, monthsBetween(now, input.targetDate));
   const requiredMonthlySaving = money(remainingAmount / availableMonths);
   const difficulty = getDifficulty(remainingAmount, requiredMonthlySaving, input.savingCapacity);
-  const estimatedMonths = recommendedMonthlySaving > 0 ? Math.ceil(remainingAmount / recommendedMonthlySaving) : 0;
+  const estimatedMonths =
+    recommendedMonthlySaving > 0 ? Math.ceil(remainingAmount / recommendedMonthlySaving) : 0;
 
   return {
     progress,
     remainingAmount,
     recommendedMonthlySaving,
     estimatedCompletionDate:
-      remainingAmount === 0 ? now : recommendedMonthlySaving > 0 ? addMonths(now, estimatedMonths) : null,
+      remainingAmount === 0
+        ? now
+        : recommendedMonthlySaving > 0
+          ? addMonths(now, estimatedMonths)
+          : null,
     difficulty,
     status: progress >= 100 ? ("COMPLETED" as const) : ("ACTIVE" as const),
-    milestones: [25, 50, 75, 100].map((threshold) => ({ threshold, reached: progress >= threshold })),
+    milestones: [25, 50, 75, 100].map((threshold) => ({
+      threshold,
+      reached: progress >= threshold,
+    })),
   };
 }
 
-function getDifficulty(remaining: number, required: number, capacity: number): SavingPlanDifficulty {
+function getDifficulty(
+  remaining: number,
+  required: number,
+  capacity: number,
+): SavingPlanDifficulty {
   if (remaining === 0) return "EASY";
   if (capacity === 0 || required > capacity) return "UNREALISTIC";
   const effort = required / capacity;

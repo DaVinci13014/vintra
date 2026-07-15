@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { requireSession } from "@/features/auth/server";
 import { getRecommendation } from "@/features/recommendations";
-import { RecommendationActions } from "@/features/recommendations/ui/recommendation-actions";
+import { RecommendationActions } from "@/features/recommendations/ui";
 import { RecommendationsLayout } from "@/widgets/recommendations";
 
 const CATEGORY_LABELS = {

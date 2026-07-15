@@ -9,6 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
     "test:integration": "RUN_DATABASE_TESTS=true vitest run",
     "typecheck": "tsc --noEmit",
@@ -55,5 +57,10 @@
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"
+  },
+  "pnpm": {
+    "overrides": {
+      "@hono/node-server": "1.19.13"
+    }
   }
 }

@@ -1,1 +1,15 @@
-export default function GoalsLoading() { return <main className="min-h-svh animate-pulse bg-background px-4 py-12"><div className="mx-auto max-w-5xl space-y-6"><div className="h-12 w-64 rounded-xl bg-card" /><div className="h-48 rounded-3xl bg-card" /><div className="grid gap-3 sm:grid-cols-3"><div className="h-28 rounded-2xl bg-card" /><div className="h-28 rounded-2xl bg-card" /><div className="h-28 rounded-2xl bg-card" /></div></div></main>; }
+export default function GoalsLoading() {
+  return (
+    <main className="min-h-svh animate-pulse bg-background px-4 py-12">
+      <div className="mx-auto max-w-5xl space-y-6">
+        <div className="h-12 w-64 rounded-xl bg-card" />
+        <div className="h-48 rounded-3xl bg-card" />
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="h-28 rounded-2xl bg-card" />
+          <div className="h-28 rounded-2xl bg-card" />
+          <div className="h-28 rounded-2xl bg-card" />
+        </div>
+      </div>
+    </main>
+  );
+}

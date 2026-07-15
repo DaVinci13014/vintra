@@ -1,0 +1,6 @@
+.next/
+.next-dev/
+node_modules/
+docs/
+src/shared/api/generated/
+pnpm-lock.yaml

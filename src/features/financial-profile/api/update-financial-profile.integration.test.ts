@@ -77,7 +77,7 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
         shoppingExpense: 80,
         hobbyExpense: 100,
         subscriptionExpense: 50,
-      currentSavings: 0,
+        currentSavings: 0,
         monthlySavings: 600,
       };
       expect((await updateFinancialProfile(input)).success).toBe(true);
@@ -94,8 +94,8 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
       });
       expect(profile.financialProfiles).toHaveLength(2);
       expect(profile.savingsSnapshots).toHaveLength(2);
-    expect(profile.hasSavings).toBe(false);
-    expect(profile.goals[0]?.currentAmount.toNumber()).toBe(0);
+      expect(profile.hasSavings).toBe(false);
+      expect(profile.goals[0]?.currentAmount.toNumber()).toBe(0);
       expect(profile.savingPlans).toHaveLength(1);
     });
   },

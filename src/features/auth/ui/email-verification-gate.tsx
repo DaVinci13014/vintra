@@ -84,7 +84,10 @@ export function EmailVerificationGate({ email }: EmailVerificationGateProps) {
           <MailCheck aria-hidden="true" size={28} />
         </div>
 
-        <h1 id="email-verification-title" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+        <h1
+          id="email-verification-title"
+          className="text-2xl font-semibold tracking-tight sm:text-3xl"
+        >
           Vérifiez votre adresse email
         </h1>
         <p
@@ -120,12 +123,7 @@ export function EmailVerificationGate({ email }: EmailVerificationGateProps) {
           </Button>
         </div>
 
-        <Button
-          className="mt-3 w-full"
-          variant="ghost"
-          onClick={signOut}
-          disabled={isSigningOut}
-        >
+        <Button className="mt-3 w-full" variant="ghost" onClick={signOut} disabled={isSigningOut}>
           {isSigningOut ? "Déconnexion..." : "Se déconnecter"}
         </Button>
 

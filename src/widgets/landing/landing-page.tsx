@@ -25,8 +25,8 @@ export function LandingPage() {
                 <span className="mt-4 block text-secondary-text">Simplement.</span>
               </h1>
               <p className="mt-10 max-w-xl text-lg leading-7 text-secondary-text sm:text-xl sm:leading-8">
-                Vintra vous aide à comprendre vos finances et à construire votre épargne à
-                votre rythme.
+                Vintra vous aide à comprendre vos finances et à construire votre épargne à votre
+                rythme.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <Button asChild size="lg">

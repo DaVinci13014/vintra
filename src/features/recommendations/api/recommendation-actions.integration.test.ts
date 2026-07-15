@@ -140,6 +140,15 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
         (await prisma.recommendation.findUniqueOrThrow({ where: { id: recommendation.id } }))
           .status,
       ).toBe("APPLIED");
+      const dashboardAfterApplication = await getDashboardData(userId);
+      expect(dashboardAfterApplication.completed).toBe(true);
+      if (dashboardAfterApplication.completed) {
+        expect(
+          dashboardAfterApplication.recommendations.some(
+            (dashboardRecommendation) => dashboardRecommendation.id === recommendation.id,
+          ),
+        ).toBe(false);
+      }
 
       expect((await archiveRecommendation(recommendation.id)).success).toBe(true);
       expect(await getRecommendation(userId, recommendation.id)).toBeNull();
