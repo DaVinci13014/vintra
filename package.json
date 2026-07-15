@@ -5,7 +5,7 @@
   "type": "module",
   "packageManager": "pnpm@10.13.1",
   "scripts": {
-    "dev": "next dev --turbopack --port 3000",
+    "dev": "next dev --turbopack --port 13014",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",

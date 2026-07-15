@@ -5,8 +5,12 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Vintra", template: "%s · Vintra" },
+  title: { default: "Vintra - Conseiller financier", template: "%s · Vintra" },
   description: "Comprenez vos finances et construisez une épargne à votre rythme.",
+  icons: {
+    icon: "/logo/vintra-logo.svg",
+    shortcut: "/logo/vintra-logo.svg",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

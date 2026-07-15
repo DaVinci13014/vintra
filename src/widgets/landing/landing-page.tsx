@@ -11,11 +11,8 @@ export function LandingPage() {
           <header className="flex items-center justify-between gap-4">
             <Logo priority />
             <nav aria-label="Authentification" className="flex items-center gap-2">
-              <Button asChild variant="ghost">
-                <Link href="/connexion">Connexion</Link>
-              </Button>
               <Button asChild variant="primary">
-                <Link href="/inscription">Commencer</Link>
+                <Link href="/connexion">Connexion</Link>
               </Button>
             </nav>
           </header>
