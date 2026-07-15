@@ -38,6 +38,7 @@ export type OnboardingValues = {
 export type OnboardingState = {
   currentStep: number;
   values: OnboardingValues;
+  completed: boolean;
 };
 
 export type OnboardingFieldSetter = <Key extends FieldPath<OnboardingValues>>(

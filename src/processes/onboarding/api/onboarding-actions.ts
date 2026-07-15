@@ -3,6 +3,7 @@
 import { z } from "zod";
 
 import { getSession } from "@/features/auth/server";
+import { runInitialAnalysis } from "@/features/financial-analysis";
 import type { ApiResponse } from "@/shared/api";
 import { prisma } from "@/shared/api/database";
 import {
@@ -92,6 +93,34 @@ export async function markQuestionnaireReady(input: unknown): Promise<ApiRespons
   });
 
   return { success: true, data: { nextStep: READY_FOR_ANALYSIS_STEP } };
+}
+
+export async function completeOnboardingAnalysis(): Promise<ApiResponse<{ destination: string }>> {
+  const session = await getSession();
+  if (!session) return unauthorizedResponse();
+  if (!session.user.emailVerified) return emailVerificationRequiredResponse();
+
+  try {
+    await runInitialAnalysis(session.user.id);
+    return { success: true, data: { destination: "/dashboard" } };
+  } catch (error) {
+    if (error instanceof Error && error.message === "ONBOARDING_INCOMPLETE") {
+      return {
+        success: false,
+        error: {
+          code: "ONBOARDING_INCOMPLETE",
+          message: "Certaines réponses doivent être complétées avant l’analyse.",
+        },
+      };
+    }
+    return {
+      success: false,
+      error: {
+        code: "ANALYSIS_FAILED",
+        message: "L’analyse n’a pas pu être créée. Réessayez dans quelques instants.",
+      },
+    };
+  }
 }
 
 function findFirstIncompleteStep(values: OnboardingValues) {

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
@@ -18,6 +19,7 @@ import {
 } from "@/processes/onboarding/model";
 import { Button } from "@/shared/ui";
 import {
+  completeOnboardingAnalysis,
   markQuestionnaireReady,
   saveOnboardingStep,
   setOnboardingPosition,
@@ -32,6 +34,7 @@ type OnboardingFlowProps = {
 };
 
 export function OnboardingFlow({ initialState, firstName }: OnboardingFlowProps) {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(initialState.currentStep);
   const [isEditingFromSummary, setIsEditingFromSummary] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -89,8 +92,7 @@ export function OnboardingFlow({ initialState, firstName }: OnboardingFlowProps)
           setErrorMessage(response.error.message);
           return;
         }
-
-        setCurrentStep(response.data.nextStep);
+        await launchAnalysis();
       });
       return;
     }
@@ -116,6 +118,21 @@ export function OnboardingFlow({ initialState, firstName }: OnboardingFlowProps)
       setIsEditingFromSummary(false);
       setCurrentStep(response.data.nextStep);
     });
+  }
+
+  async function launchAnalysis() {
+    setErrorMessage(null);
+    const response = await completeOnboardingAnalysis();
+    if (!response.success) {
+      setErrorMessage(response.error.message);
+      return;
+    }
+    router.push(response.data.destination);
+    router.refresh();
+  }
+
+  function handleLaunchAnalysis() {
+    startTransition(launchAnalysis);
   }
 
   return (
@@ -173,6 +190,8 @@ export function OnboardingFlow({ initialState, firstName }: OnboardingFlowProps)
               <QuestionnaireReady
                 firstName={firstName}
                 onReview={() => moveToStep(SUMMARY_STEP)}
+                onAnalyze={handleLaunchAnalysis}
+                isPending={isPending}
               />
             )}
           </motion.div>
@@ -203,7 +222,7 @@ export function OnboardingFlow({ initialState, firstName }: OnboardingFlowProps)
               {isPending
                 ? "Enregistrement..."
                 : currentStep === SUMMARY_STEP
-                  ? "Terminer"
+                  ? "Créer mon analyse"
                   : "Continuer"}
             </Button>
           </div>

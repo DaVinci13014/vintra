@@ -14,6 +14,7 @@ export async function getOnboardingState(userId: string): Promise<OnboardingStat
 
   return {
     currentStep: clampOnboardingStep(profile.currentOnboardingStep),
+    completed: profile.onboardingCompleted,
     values: {
       ...EMPTY_ONBOARDING_VALUES,
       birthDate: formatDate(profile.birthDate),

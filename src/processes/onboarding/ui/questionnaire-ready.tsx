@@ -1,11 +1,20 @@
 import { Check, ShieldCheck } from "lucide-react";
 
+import { Button } from "@/shared/ui";
+
 type QuestionnaireReadyProps = {
   firstName: string;
   onReview: () => void;
+  onAnalyze: () => void;
+  isPending: boolean;
 };
 
-export function QuestionnaireReady({ firstName, onReview }: QuestionnaireReadyProps) {
+export function QuestionnaireReady({
+  firstName,
+  onReview,
+  onAnalyze,
+  isPending,
+}: QuestionnaireReadyProps) {
   return (
     <div className="mx-auto max-w-xl text-center">
       <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-brand text-brand-foreground">
@@ -25,13 +34,19 @@ export function QuestionnaireReady({ firstName, onReview }: QuestionnaireReadyPr
           Vos données restent privées et modifiables. Aucun calcul ni conseil n’a encore été généré.
         </p>
       </div>
-      <button
-        type="button"
-        onClick={onReview}
-        className="mt-6 min-h-11 rounded-xl px-4 text-sm font-medium text-secondary-text outline-none hover:bg-card hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand"
-      >
-        Relire mes réponses
-      </button>
+      <div className="mt-6 flex flex-col-reverse justify-center gap-3 sm:flex-row">
+        <button
+          type="button"
+          onClick={onReview}
+          disabled={isPending}
+          className="min-h-11 rounded-xl px-4 text-sm font-medium text-secondary-text outline-none hover:bg-card hover:text-foreground focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50"
+        >
+          Relire mes réponses
+        </button>
+        <Button type="button" onClick={onAnalyze} disabled={isPending}>
+          {isPending ? "Analyse en cours..." : "Créer mon analyse"}
+        </Button>
+      </div>
     </div>
   );
 }
