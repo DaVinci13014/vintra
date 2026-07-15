@@ -125,6 +125,7 @@ export async function updateFinancialProfile(
     });
     revalidatePath("/dashboard");
     revalidatePath("/profile");
+    revalidatePath("/settings/profile/finances");
     revalidatePath("/goals");
     return { success: true, data: { destination: "/dashboard" } };
   } catch {

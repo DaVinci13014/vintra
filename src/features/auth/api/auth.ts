@@ -61,6 +61,14 @@ export const auth = betterAuth({
     },
   },
   user: {
+    deleteUser: {
+      enabled: true,
+      beforeDelete: async (user) => {
+        await prisma.auditLog.create({
+          data: { userId: user.id, action: "ACCOUNT_DELETED" },
+        });
+      },
+    },
     additionalFields: {
       firstName: {
         type: "string",

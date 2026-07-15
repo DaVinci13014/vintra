@@ -61,13 +61,13 @@ export function DashboardPage({
             >
               <Bell size={19} aria-hidden="true" />
             </button>
-            <button
-              disabled
-              className="grid size-11 place-items-center rounded-xl border border-border bg-card text-muted"
-              aria-label="Paramètres — bientôt disponible"
+            <Link
+              href="/settings"
+              className="grid size-11 place-items-center rounded-xl border border-border bg-card text-muted transition hover:text-foreground"
+              aria-label="Paramètres"
             >
               <Settings size={19} aria-hidden="true" />
-            </button>
+            </Link>
           </nav>
         </div>
       </header>
@@ -240,14 +240,26 @@ export function DashboardPage({
             Ces accès seront activés avec les écrans de modification correspondants.
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <ActionLink icon={CircleDollarSign} label="Modifier mes revenus" href="/profile" />
-            <ActionLink icon={ReceiptText} label="Modifier mes dépenses" href="/profile" />
+            <ActionLink
+              icon={CircleDollarSign}
+              label="Modifier mes revenus"
+              href="/settings/profile/finances"
+            />
+            <ActionLink
+              icon={ReceiptText}
+              label="Modifier mes dépenses"
+              href="/settings/profile/finances"
+            />
             <ActionLink
               icon={Target}
               label={data.goal ? "Modifier mon objectif" : "Créer un objectif"}
               href={data.goal ? `/goals/${data.goal.id}/modifier` : "/goals/nouveau"}
             />
-            <ActionLink icon={UserRound} label="Mettre à jour mon profil" href="/profile" />
+            <ActionLink
+              icon={UserRound}
+              label="Mettre à jour mon profil"
+              href="/settings/profile"
+            />
           </div>
         </section>
       </div>
@@ -260,8 +272,8 @@ export function DashboardPage({
           <NavItem href="/dashboard" label="Accueil" icon={Gauge} active />
           <NavItem href="/goals" label="Objectifs" icon={Target} />
           <NavItem href="/recommendations" label="Conseils" icon={Sparkles} />
-          <NavItem href="/profile" label="Profil" icon={WalletCards} />
-          <PendingNavItem label="Réglages" icon={Settings} />
+          <NavItem href="/settings/profile" label="Profil" icon={WalletCards} />
+          <NavItem href="/settings" label="Réglages" icon={Settings} />
         </div>
       </nav>
     </main>
@@ -315,18 +327,6 @@ function NavItem({
       <Icon size={19} aria-hidden="true" />
       <span>{label}</span>
     </Link>
-  );
-}
-
-function PendingNavItem({ label, icon: Icon }: { label: string; icon: Icon }) {
-  return (
-    <span
-      aria-disabled="true"
-      className="flex min-w-16 flex-col items-center gap-1 rounded-xl px-2 py-1 text-xs text-muted/60"
-    >
-      <Icon size={19} aria-hidden="true" />
-      <span>{label}</span>
-    </span>
   );
 }
 
