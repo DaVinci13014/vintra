@@ -1,6 +1,5 @@
 import {
   Bell,
-  BarChart3,
   CalendarClock,
   CircleDollarSign,
   Gauge,
@@ -189,11 +188,16 @@ export function DashboardPage({
         <SavingsHistoryChart data={data.savingsHistory} currency={data.currency} />
 
         <section aria-labelledby="recommendations-title">
-          <div className="mb-4 flex items-center gap-2">
-            <Sparkles className="text-brand" size={20} aria-hidden="true" />
-            <h2 id="recommendations-title" className="text-lg font-semibold">
-              Vos priorités
-            </h2>
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="text-brand" size={20} aria-hidden="true" />
+              <h2 id="recommendations-title" className="text-lg font-semibold">
+                Vos priorités
+              </h2>
+            </div>
+            <Link href="/recommendations" className="text-sm text-brand hover:underline">
+              Voir toutes
+            </Link>
           </div>
           {data.recommendations.length === 0 ? (
             <div className="rounded-2xl border border-border bg-surface p-6 text-secondary-text">
@@ -202,9 +206,10 @@ export function DashboardPage({
           ) : (
             <div className="grid gap-3 lg:grid-cols-3">
               {data.recommendations.map((recommendation) => (
-                <article
+                <Link
                   key={recommendation.id}
-                  className="flex flex-col rounded-2xl border border-border bg-surface p-5"
+                  href={`/recommendations/${recommendation.id}`}
+                  className="group flex flex-col rounded-2xl border border-border bg-surface p-5 transition hover:border-brand/40"
                 >
                   <p className="text-xs font-medium uppercase tracking-wide text-brand">
                     {recommendation.priority}
@@ -218,7 +223,10 @@ export function DashboardPage({
                       Jusqu’à {money.format(recommendation.potentialSaving)}/mois
                     </p>
                   )}
-                </article>
+                  <span className="mt-4 text-sm text-brand group-hover:underline">
+                    Voir le détail
+                  </span>
+                </Link>
               ))}
             </div>
           )}
@@ -251,7 +259,7 @@ export function DashboardPage({
         <div className="mx-auto flex max-w-xl items-center justify-around">
           <NavItem href="/dashboard" label="Accueil" icon={Gauge} active />
           <NavItem href="/goals" label="Objectifs" icon={Target} />
-          <PendingNavItem label="Statistiques" icon={BarChart3} />
+          <NavItem href="/recommendations" label="Conseils" icon={Sparkles} />
           <NavItem href="/profile" label="Profil" icon={WalletCards} />
           <PendingNavItem label="Réglages" icon={Settings} />
         </div>

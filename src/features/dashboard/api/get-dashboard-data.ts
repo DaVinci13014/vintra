@@ -57,6 +57,7 @@ export async function getDashboardData(userId: string) {
           impact: true,
           difficulty: true,
           potentialSaving: true,
+          status: true,
         },
       },
       savingsSnapshots: {
@@ -86,8 +87,25 @@ export async function getDashboardData(userId: string) {
     .slice(0, 3)
     .map((recommendation) => ({
       ...recommendation,
+      status:
+        recommendation.status === "GENERATED" ? ("DISPLAYED" as const) : recommendation.status,
       potentialSaving: recommendation.potentialSaving.toNumber(),
     }));
+
+  const displayedRecommendationIds = recommendations
+    .filter((recommendation) => recommendation.status === "DISPLAYED")
+    .map((recommendation) => recommendation.id);
+
+  if (displayedRecommendationIds.length > 0) {
+    await prisma.recommendation.updateMany({
+      where: {
+        id: { in: displayedRecommendationIds },
+        profile: { userId },
+        status: "GENERATED",
+      },
+      data: { status: "DISPLAYED" },
+    });
+  }
 
   return {
     completed: true as const,
@@ -100,17 +118,21 @@ export async function getDashboardData(userId: string) {
       savingCapacity: financialProfile.savingCapacity.toNumber(),
       savingRate: financialProfile.savingRate.toNumber(),
     },
-    goal: goal ? {
-      ...goal,
-      targetAmount: goal.targetAmount.toNumber(),
-      currentAmount: goal.currentAmount.toNumber(),
-      progress: goal.progress.toNumber(),
-    } : null,
-    savingPlan: savingPlan ? {
-      ...savingPlan,
-      recommendedMonthlySaving: savingPlan.recommendedMonthlySaving.toNumber(),
-      progress: savingPlan.progress.toNumber(),
-    } : null,
+    goal: goal
+      ? {
+          ...goal,
+          targetAmount: goal.targetAmount.toNumber(),
+          currentAmount: goal.currentAmount.toNumber(),
+          progress: goal.progress.toNumber(),
+        }
+      : null,
+    savingPlan: savingPlan
+      ? {
+          ...savingPlan,
+          recommendedMonthlySaving: savingPlan.recommendedMonthlySaving.toNumber(),
+          progress: savingPlan.progress.toNumber(),
+        }
+      : null,
     recommendations,
     savingsHistory: profile.savingsSnapshots
       .map((snapshot) => ({
