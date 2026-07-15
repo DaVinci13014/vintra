@@ -11,7 +11,7 @@ export type AnalysisInput = {
   shoppingExpense: number;
   hobbyExpense: number;
   subscriptionExpense: number;
-  impulsePurchase: Exclude<Frequency, "ALWAYS">;
+  impulsePurchase: Frequency;
   bankCheckFrequency:
     | "DAILY"
     | "SEVERAL_TIMES_A_WEEK"

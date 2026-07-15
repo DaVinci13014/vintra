@@ -143,10 +143,10 @@ export function DashboardPage({ data, firstName }: { data: CompletedDashboardDat
           <h2 id="quick-actions-title" className="text-lg font-semibold">Actions rapides</h2>
           <p className="mt-1 text-sm text-secondary-text">Ces accès seront activés avec les écrans de modification correspondants.</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <PendingAction icon={CircleDollarSign} label="Modifier mes revenus" />
-            <PendingAction icon={ReceiptText} label="Modifier mes dépenses" />
+            <ActionLink icon={CircleDollarSign} label="Modifier mes revenus" href="/profile" />
+            <ActionLink icon={ReceiptText} label="Modifier mes dépenses" href="/profile" />
             <ActionLink icon={Target} label={data.goal ? "Modifier mon objectif" : "Créer un objectif"} href={data.goal ? `/goals/${data.goal.id}/modifier` : "/goals/nouveau"} />
-            <PendingAction icon={UserRound} label="Mettre à jour mon profil" />
+            <ActionLink icon={UserRound} label="Mettre à jour mon profil" href="/profile" />
           </div>
         </section>
       </div>
@@ -156,7 +156,7 @@ export function DashboardPage({ data, firstName }: { data: CompletedDashboardDat
           <NavItem href="/dashboard" label="Accueil" icon={Gauge} active />
           <NavItem href="/goals" label="Objectifs" icon={Target} />
           <PendingNavItem label="Statistiques" icon={BarChart3} />
-          <PendingNavItem label="Profil" icon={WalletCards} />
+          <NavItem href="/profile" label="Profil" icon={WalletCards} />
           <PendingNavItem label="Réglages" icon={Settings} />
         </div>
       </nav>
@@ -191,15 +191,6 @@ function PendingNavItem({ label, icon: Icon }: { label: string; icon: Icon }) {
       <Icon size={19} aria-hidden="true" />
       <span>{label}</span>
     </span>
-  );
-}
-
-function PendingAction({ icon: Icon, label }: { icon: Icon; label: string }) {
-  return (
-    <button type="button" disabled className="flex min-h-20 items-center gap-3 rounded-2xl border border-border bg-surface px-4 text-left text-sm text-muted">
-      <Icon size={19} aria-hidden="true" />
-      <span>{label}</span>
-    </button>
   );
 }
 

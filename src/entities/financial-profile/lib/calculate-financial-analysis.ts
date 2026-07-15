@@ -204,8 +204,8 @@ function frequencyValue(value: Frequency | null) {
   ];
 }
 
-function inverseFrequencyValue(value: Exclude<Frequency, "ALWAYS">) {
-  return { NEVER: 100, RARELY: 80, SOMETIMES: 55, OFTEN: 25, VERY_OFTEN: 5 }[value];
+function inverseFrequencyValue(value: Frequency) {
+  return { NEVER: 100, RARELY: 80, SOMETIMES: 55, OFTEN: 25, VERY_OFTEN: 5, ALWAYS: 0 }[value];
 }
 
 function band(value: number, bands: ReadonlyArray<readonly [number, number]>) {

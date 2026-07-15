@@ -15,7 +15,7 @@ const analysisProfileSchema = z.object({
   shoppingExpense: z.number().finite().min(0),
   hobbyExpense: z.number().finite().min(0),
   subscriptionExpense: z.number().finite().min(0),
-  impulsePurchase: z.enum(["NEVER", "RARELY", "SOMETIMES", "OFTEN", "VERY_OFTEN"]),
+  impulsePurchase: z.enum(["NEVER", "RARELY", "SOMETIMES", "OFTEN", "VERY_OFTEN", "ALWAYS"]),
   bankCheckFrequency: z.enum([
     "DAILY",
     "SEVERAL_TIMES_A_WEEK",
