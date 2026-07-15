@@ -13,11 +13,7 @@ export type AnalysisInput = {
   subscriptionExpense: number;
   impulsePurchase: Frequency;
   bankCheckFrequency:
-    | "DAILY"
-    | "SEVERAL_TIMES_A_WEEK"
-    | "WEEKLY"
-    | "A_FEW_TIMES_A_MONTH"
-    | "RARELY";
+    "DAILY" | "SEVERAL_TIMES_A_WEEK" | "WEEKLY" | "A_FEW_TIMES_A_MONTH" | "RARELY";
   hasBudget: boolean;
   budgetCompliance: Frequency | null;
   installmentUsage: "NEVER" | "RARELY" | "SOMETIMES" | "OFTEN";

@@ -33,9 +33,7 @@ export function calculateFinancialAnalysis(
   const budgetScore = calculateBudgetScore(expenseRatio, input.incomeFrequency);
   const savingScore = calculateSavingScore(input, savingRate, savingCapacity, monthlyExpenses);
   const disciplineScore = calculateDisciplineScore(input);
-  const financialHealthScore = score(
-    savingScore * 0.4 + budgetScore * 0.3 + disciplineScore * 0.3,
-  );
+  const financialHealthScore = score(savingScore * 0.4 + budgetScore * 0.3 + disciplineScore * 0.3);
   const profileType = determineProfile(input, {
     expenseRatio,
     savingRate,
@@ -136,9 +134,7 @@ function calculateDisciplineScore(input: AnalysisInput) {
     A_FEW_TIMES_A_MONTH: 55,
     RARELY: 25,
   }[input.bankCheckFrequency];
-  const installment = { NEVER: 100, RARELY: 75, SOMETIMES: 45, OFTEN: 15 }[
-    input.installmentUsage
-  ];
+  const installment = { NEVER: 100, RARELY: 75, SOMETIMES: 45, OFTEN: 15 }[input.installmentUsage];
   const endOfMonth = { NEVER: 100, RARELY: 75, SOMETIMES: 50, OFTEN: 20, EVERY_MONTH: 0 }[
     input.endOfMonthDifficulty
   ];
@@ -149,11 +145,7 @@ function determineProfile(
   input: AnalysisInput,
   indicators: Pick<
     FinancialAnalysis,
-    | "expenseRatio"
-    | "savingRate"
-    | "remainingBudget"
-    | "financialHealthScore"
-    | "disciplineScore"
+    "expenseRatio" | "savingRate" | "remainingBudget" | "financialHealthScore" | "disciplineScore"
   >,
 ): FinancialProfileType {
   if (
@@ -199,9 +191,7 @@ function determineDifficulty(
 
 function frequencyValue(value: Frequency | null) {
   if (!value) return 20;
-  return { NEVER: 0, RARELY: 25, SOMETIMES: 50, OFTEN: 75, VERY_OFTEN: 90, ALWAYS: 100 }[
-    value
-  ];
+  return { NEVER: 0, RARELY: 25, SOMETIMES: 50, OFTEN: 75, VERY_OFTEN: 90, ALWAYS: 100 }[value];
 }
 
 function inverseFrequencyValue(value: Frequency) {
