@@ -76,7 +76,9 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 8,
     maxPasswordLength: 128,
-    requireEmailVerification: hasEmailProvider,
+    // La session est créée avant la vérification. Les fonctionnalités privées
+    // restent verrouillées côté serveur jusqu'à ce que l'email soit confirmé.
+    requireEmailVerification: false,
     revokeSessionsOnPasswordReset: true,
     password: {
       hash: hashPassword,
@@ -95,6 +97,7 @@ export const auth = betterAuth({
   },
   emailVerification: {
     autoSignInAfterVerification: true,
+    sendOnSignUp: hasEmailProvider,
     sendVerificationEmail: async ({ user, url }) => {
       await sendAuthEmail({
         to: user.email,

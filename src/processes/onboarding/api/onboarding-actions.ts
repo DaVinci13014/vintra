@@ -27,6 +27,7 @@ type StepResult = { nextStep: number };
 export async function saveOnboardingStep(input: unknown): Promise<ApiResponse<StepResult>> {
   const session = await getSession();
   if (!session) return unauthorizedResponse();
+  if (!session.user.emailVerified) return emailVerificationRequiredResponse();
 
   const parsedInput = saveStepInputSchema.safeParse(input);
   if (!parsedInput.success) return validationResponse();
@@ -53,6 +54,7 @@ export async function saveOnboardingStep(input: unknown): Promise<ApiResponse<St
 export async function setOnboardingPosition(input: unknown): Promise<ApiResponse<StepResult>> {
   const session = await getSession();
   if (!session) return unauthorizedResponse();
+  if (!session.user.emailVerified) return emailVerificationRequiredResponse();
 
   const parsedStep = positionSchema.safeParse(input);
   if (!parsedStep.success) return validationResponse();
@@ -68,6 +70,7 @@ export async function setOnboardingPosition(input: unknown): Promise<ApiResponse
 export async function markQuestionnaireReady(input: unknown): Promise<ApiResponse<StepResult>> {
   const session = await getSession();
   if (!session) return unauthorizedResponse();
+  if (!session.user.emailVerified) return emailVerificationRequiredResponse();
 
   const parsedValues = onboardingDraftSchema.safeParse(input);
   if (!parsedValues.success) return validationResponse();
@@ -204,6 +207,16 @@ function unauthorizedResponse(): ApiResponse<never> {
   return {
     success: false,
     error: { code: "AUTH_UNAUTHORIZED", message: "Votre session a expiré." },
+  };
+}
+
+function emailVerificationRequiredResponse(): ApiResponse<never> {
+  return {
+    success: false,
+    error: {
+      code: "AUTH_EMAIL_NOT_VERIFIED",
+      message: "Vérifiez votre adresse email pour continuer.",
+    },
   };
 }
 

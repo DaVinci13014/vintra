@@ -4,7 +4,10 @@ import { redirect } from "next/navigation";
 import { auth } from "./auth";
 
 export async function getSession() {
-  return auth.api.getSession({ headers: await headers() });
+  return auth.api.getSession({
+    headers: await headers(),
+    query: { disableCookieCache: true },
+  });
 }
 
 export async function requireSession() {
