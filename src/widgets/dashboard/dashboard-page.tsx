@@ -83,7 +83,7 @@ export function DashboardPage({ data, firstName }: { data: CompletedDashboardDat
           </div>
         </section>
 
-        <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
+        {data.goal && data.savingPlan ? <div className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
           <section className="rounded-3xl border border-border bg-surface p-5 sm:p-7" aria-labelledby="goal-title">
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -114,7 +114,7 @@ export function DashboardPage({ data, firstName }: { data: CompletedDashboardDat
               {DIFFICULTY_LABELS[data.savingPlan.difficulty]}
             </p>
           </section>
-        </div>
+        </div> : <section className="rounded-3xl border border-dashed border-border bg-surface p-8 text-center"><Target className="mx-auto text-brand" /><h2 className="mt-4 text-xl font-semibold">Créez votre premier objectif</h2><p className="mt-2 text-secondary-text">Transformez votre capacité d’épargne en projet concret.</p><Link href="/goals/nouveau" className="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-foreground px-5 text-sm font-medium text-background">Créer un objectif</Link></section>}
 
         <SavingsHistoryChart data={data.savingsHistory} currency={data.currency} />
 
@@ -145,7 +145,7 @@ export function DashboardPage({ data, firstName }: { data: CompletedDashboardDat
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <PendingAction icon={CircleDollarSign} label="Modifier mes revenus" />
             <PendingAction icon={ReceiptText} label="Modifier mes dépenses" />
-            <PendingAction icon={Target} label="Modifier mon objectif" />
+            <ActionLink icon={Target} label={data.goal ? "Modifier mon objectif" : "Créer un objectif"} href={data.goal ? `/goals/${data.goal.id}/modifier` : "/goals/nouveau"} />
             <PendingAction icon={UserRound} label="Mettre à jour mon profil" />
           </div>
         </section>
@@ -154,7 +154,7 @@ export function DashboardPage({ data, firstName }: { data: CompletedDashboardDat
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 px-4 py-3 backdrop-blur" aria-label="Navigation principale">
         <div className="mx-auto flex max-w-xl items-center justify-around">
           <NavItem href="/dashboard" label="Accueil" icon={Gauge} active />
-          <PendingNavItem label="Objectifs" icon={Target} />
+          <NavItem href="/goals" label="Objectifs" icon={Target} />
           <PendingNavItem label="Statistiques" icon={BarChart3} />
           <PendingNavItem label="Profil" icon={WalletCards} />
           <PendingNavItem label="Réglages" icon={Settings} />
@@ -201,6 +201,10 @@ function PendingAction({ icon: Icon, label }: { icon: Icon; label: string }) {
       <span>{label}</span>
     </button>
   );
+}
+
+function ActionLink({ icon: Icon, label, href }: { icon: Icon; label: string; href: string }) {
+  return <Link href={href} className="flex min-h-20 items-center gap-3 rounded-2xl border border-border bg-surface px-4 text-left text-sm text-secondary-text transition hover:border-brand/40 hover:text-foreground"><Icon size={19} aria-hidden="true" /><span>{label}</span></Link>;
 }
 
 function getGreeting(hour: number) {

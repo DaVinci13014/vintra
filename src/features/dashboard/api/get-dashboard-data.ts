@@ -73,7 +73,7 @@ export async function getDashboardData(userId: string) {
   const financialProfile = profile.financialProfiles[0];
   const goal = profile.goals[0];
   const savingPlan = profile.savingPlans[0];
-  if (!financialProfile || !goal || !savingPlan) throw new Error("DASHBOARD_DATA_INCOMPLETE");
+  if (!financialProfile) throw new Error("DASHBOARD_DATA_INCOMPLETE");
 
   const impactWeight = { VERY_HIGH: 5, HIGH: 4, MEDIUM: 3, LOW: 2, VERY_LOW: 1 } as const;
   const priorityWeight = { CRITICAL: 4, HIGH: 3, MEDIUM: 2, LOW: 1 } as const;
@@ -100,17 +100,17 @@ export async function getDashboardData(userId: string) {
       savingCapacity: financialProfile.savingCapacity.toNumber(),
       savingRate: financialProfile.savingRate.toNumber(),
     },
-    goal: {
+    goal: goal ? {
       ...goal,
       targetAmount: goal.targetAmount.toNumber(),
       currentAmount: goal.currentAmount.toNumber(),
       progress: goal.progress.toNumber(),
-    },
-    savingPlan: {
+    } : null,
+    savingPlan: savingPlan ? {
       ...savingPlan,
       recommendedMonthlySaving: savingPlan.recommendedMonthlySaving.toNumber(),
       progress: savingPlan.progress.toNumber(),
-    },
+    } : null,
     recommendations,
     savingsHistory: profile.savingsSnapshots
       .map((snapshot) => ({

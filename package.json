@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "test": "vitest run",
-    "test:integration": "RUN_DATABASE_TESTS=true vitest run src/features/financial-analysis/api/run-initial-analysis.integration.test.ts",
+    "test:integration": "RUN_DATABASE_TESTS=true vitest run",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
