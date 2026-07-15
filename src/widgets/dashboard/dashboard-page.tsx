@@ -1,19 +1,23 @@
 import {
   Bell,
+  BarChart3,
   CalendarClock,
   CircleDollarSign,
   Gauge,
   PiggyBank,
+  ReceiptText,
   Settings,
   Sparkles,
   Target,
   TrendingDown,
   WalletCards,
+  UserRound,
 } from "lucide-react";
 import Link from "next/link";
 
 import type { DashboardData } from "@/features/dashboard";
 import { Logo } from "@/shared/ui";
+import { SavingsHistoryChart } from "./savings-history-chart";
 
 type CompletedDashboardData = Extract<DashboardData, { completed: true }>;
 
@@ -112,6 +116,8 @@ export function DashboardPage({ data, firstName }: { data: CompletedDashboardDat
           </section>
         </div>
 
+        <SavingsHistoryChart data={data.savingsHistory} currency={data.currency} />
+
         <section aria-labelledby="recommendations-title">
           <div className="mb-4 flex items-center gap-2">
             <Sparkles className="text-brand" size={20} aria-hidden="true" />
@@ -132,12 +138,24 @@ export function DashboardPage({ data, firstName }: { data: CompletedDashboardDat
             </div>
           )}
         </section>
+
+        <section aria-labelledby="quick-actions-title">
+          <h2 id="quick-actions-title" className="text-lg font-semibold">Actions rapides</h2>
+          <p className="mt-1 text-sm text-secondary-text">Ces accès seront activés avec les écrans de modification correspondants.</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <PendingAction icon={CircleDollarSign} label="Modifier mes revenus" />
+            <PendingAction icon={ReceiptText} label="Modifier mes dépenses" />
+            <PendingAction icon={Target} label="Modifier mon objectif" />
+            <PendingAction icon={UserRound} label="Mettre à jour mon profil" />
+          </div>
+        </section>
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 px-4 py-3 backdrop-blur" aria-label="Navigation principale">
         <div className="mx-auto flex max-w-xl items-center justify-around">
           <NavItem href="/dashboard" label="Accueil" icon={Gauge} active />
           <PendingNavItem label="Objectifs" icon={Target} />
+          <PendingNavItem label="Statistiques" icon={BarChart3} />
           <PendingNavItem label="Profil" icon={WalletCards} />
           <PendingNavItem label="Réglages" icon={Settings} />
         </div>
@@ -173,6 +191,15 @@ function PendingNavItem({ label, icon: Icon }: { label: string; icon: Icon }) {
       <Icon size={19} aria-hidden="true" />
       <span>{label}</span>
     </span>
+  );
+}
+
+function PendingAction({ icon: Icon, label }: { icon: Icon; label: string }) {
+  return (
+    <button type="button" disabled className="flex min-h-20 items-center gap-3 rounded-2xl border border-border bg-surface px-4 text-left text-sm text-muted">
+      <Icon size={19} aria-hidden="true" />
+      <span>{label}</span>
+    </button>
   );
 }
 

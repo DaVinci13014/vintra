@@ -145,6 +145,14 @@ export async function runInitialAnalysis(userId: string) {
       },
     });
 
+    await transaction.savingsSnapshot.create({
+      data: {
+        profileId: profile.id,
+        amount: input.currentSavings,
+        recordedAt: now,
+      },
+    });
+
     await transaction.savingPlan.create({
       data: {
         profileId: profile.id,

@@ -59,6 +59,11 @@ export async function getDashboardData(userId: string) {
           potentialSaving: true,
         },
       },
+      savingsSnapshots: {
+        orderBy: { recordedAt: "desc" },
+        take: 120,
+        select: { amount: true, recordedAt: true },
+      },
     },
   });
 
@@ -107,5 +112,11 @@ export async function getDashboardData(userId: string) {
       progress: savingPlan.progress.toNumber(),
     },
     recommendations,
+    savingsHistory: profile.savingsSnapshots
+      .map((snapshot) => ({
+        amount: snapshot.amount.toNumber(),
+        recordedAt: snapshot.recordedAt.toISOString(),
+      }))
+      .reverse(),
   };
 }

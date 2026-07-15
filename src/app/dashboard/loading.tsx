@@ -10,6 +10,7 @@ export default function DashboardLoading() {
           <div className="h-72 rounded-3xl bg-card" />
           <div className="h-72 rounded-3xl bg-card" />
         </div>
+        <div className="h-80 rounded-3xl bg-card" />
       </div>
     </main>
   );

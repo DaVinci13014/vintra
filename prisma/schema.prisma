@@ -113,10 +113,22 @@ model Profile {
   goals                 Goal[]
   savingPlans           SavingPlan[]
   recommendations       Recommendation[]
+  savingsSnapshots      SavingsSnapshot[]
 
   @@index([country])
   @@index([profession])
   @@map("profiles")
+}
+
+model SavingsSnapshot {
+  id         String   @id @default(uuid()) @db.Uuid
+  profileId  String   @db.Uuid
+  amount     Decimal  @db.Decimal(14, 2)
+  recordedAt DateTime @default(now())
+  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, recordedAt])
+  @@map("savings_snapshots")
 }
 
 model FinancialProfile {
