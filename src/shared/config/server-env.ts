@@ -5,7 +5,7 @@ const serverEnvSchema = z.object({
   BETTER_AUTH_SECRET: z.string().min(32),
   BETTER_AUTH_URL: z.url(),
   RESEND_API_KEY: z.string().min(1).optional(),
-  EMAIL_FROM: z.string().min(1).default("Vintra <noreply@example.com>"),
+  EMAIL_FROM: z.string().min(1).optional(),
 });
 
 const parsedEnv = serverEnvSchema.safeParse({
@@ -13,7 +13,7 @@ const parsedEnv = serverEnvSchema.safeParse({
   BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
   RESEND_API_KEY: process.env.RESEND_API_KEY || undefined,
-  EMAIL_FROM: process.env.EMAIL_FROM,
+  EMAIL_FROM: process.env.EMAIL_FROM || undefined,
 });
 
 if (!parsedEnv.success) {

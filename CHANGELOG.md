@@ -6,3 +6,4 @@
 - Initialisation du projet Next.js en architecture Feature-Sliced Design.
 - Mise en place des tokens et composants fondamentaux.
 - Création de la landing, de la connexion et de l’inscription.
+- Ajout du flux de vérification email avec Better Auth et Resend, activé par configuration.

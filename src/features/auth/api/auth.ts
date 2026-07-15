@@ -8,7 +8,7 @@ import { sendAuthEmail } from "@/shared/api/email";
 import { serverEnv } from "@/shared/config";
 import { hashPassword, verifyPassword } from "../lib/password";
 
-const hasEmailProvider = Boolean(serverEnv.RESEND_API_KEY);
+const hasEmailProvider = Boolean(serverEnv.RESEND_API_KEY && serverEnv.EMAIL_FROM);
 
 export const auth = betterAuth({
   appName: "Vintra",
@@ -83,7 +83,7 @@ export const auth = betterAuth({
       verify: verifyPassword,
     },
     sendResetPassword: async ({ user, url }) => {
-      void sendAuthEmail({
+      await sendAuthEmail({
         to: user.email,
         subject: "Réinitialiser votre mot de passe Vintra",
         heading: "Réinitialisez votre mot de passe",
@@ -96,7 +96,7 @@ export const auth = betterAuth({
   emailVerification: {
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
-      void sendAuthEmail({
+      await sendAuthEmail({
         to: user.email,
         subject: "Vérifiez votre adresse email Vintra",
         heading: "Vérifiez votre adresse email",
