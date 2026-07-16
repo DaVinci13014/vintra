@@ -22,7 +22,7 @@ jobs:
       PRODUCTION_DIRECT_URL: ${{ secrets.PRODUCTION_DIRECT_URL }}
     steps:
       - name: Récupérer le dépôt
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Vérifier la présence des secrets
         run: |
@@ -88,13 +88,18 @@ jobs:
             -in "backups/${BACKUP_NAME}" \
             -out "backups/${BACKUP_NAME}.enc" \
             -pass env:BACKUP_ENCRYPTION_KEY
+          openssl dgst -sha256 -hmac "${BACKUP_ENCRYPTION_KEY}" \
+            "backups/${BACKUP_NAME}.enc" | awk '{ print $2 }' > "backups/${BACKUP_NAME}.enc.hmac"
           rm -f "backups/${BACKUP_NAME}"
           test -s "backups/${BACKUP_NAME}.enc"
+          test -s "backups/${BACKUP_NAME}.enc.hmac"
 
       - name: Conserver la sauvegarde chiffrée
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           if-no-files-found: error
           name: ${{ steps.dump.outputs.backup_name }}.enc
-          path: backups/${{ steps.dump.outputs.backup_name }}.enc
+          path: |
+            backups/${{ steps.dump.outputs.backup_name }}.enc
+            backups/${{ steps.dump.outputs.backup_name }}.enc.hmac
           retention-days: 14

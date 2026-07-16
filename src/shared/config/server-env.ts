@@ -1,34 +1,64 @@
 import { z } from "zod";
 
-const serverEnvSchema = z.object({
-  DATABASE_URL: z.string().min(1),
-  DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(20).default(1),
-  BETTER_AUTH_SECRET: z.string().min(32),
-  BETTER_AUTH_URL: z.url(),
-  CRON_SECRET: z.string().min(16).optional(),
-  LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
-  APP_VERSION: z
-    .string()
-    .regex(/^\d+\.\d+\.\d+$/)
-    .default("0.1.0"),
-  VERCEL_ENV: z.enum(["development", "preview", "production"]).optional(),
-  VERCEL_GIT_COMMIT_SHA: z
-    .string()
-    .regex(/^[a-f0-9]{7,40}$/i)
-    .optional(),
-  VERCEL_URL: z
-    .string()
-    .regex(/^[a-z0-9.-]+$/i)
-    .optional(),
-  RESEND_API_KEY: z.string().min(1).optional(),
-  EMAIL_FROM: z.string().min(1).optional(),
-  WEB_PUSH_PUBLIC_KEY: z.string().min(1).optional(),
-  WEB_PUSH_PRIVATE_KEY: z.string().min(1).optional(),
-  WEB_PUSH_SUBJECT: z
-    .string()
-    .refine((value) => value.startsWith("mailto:") || value.startsWith("https://"))
-    .optional(),
-});
+const databaseUrlSchema = z
+  .string()
+  .min(1)
+  .refine((value) => value.startsWith("postgres://") || value.startsWith("postgresql://"));
+
+const serverEnvSchema = z
+  .object({
+    DATABASE_URL: databaseUrlSchema,
+    DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(20).default(1),
+    BETTER_AUTH_SECRET: z.string().min(32),
+    BETTER_AUTH_URL: z.url(),
+    CRON_SECRET: z.string().min(16).optional(),
+    LOG_LEVEL: z
+      .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
+      .default("info"),
+    APP_VERSION: z
+      .string()
+      .regex(/^\d+\.\d+\.\d+$/)
+      .default("0.1.0"),
+    VERCEL_ENV: z.enum(["development", "preview", "production"]).optional(),
+    VERCEL_GIT_COMMIT_SHA: z
+      .string()
+      .regex(/^[a-f0-9]{7,40}$/i)
+      .optional(),
+    VERCEL_URL: z
+      .string()
+      .regex(/^[a-z0-9.-]+$/i)
+      .optional(),
+    VERCEL_BRANCH_URL: z
+      .string()
+      .regex(/^[a-z0-9.-]+$/i)
+      .optional(),
+    RESEND_API_KEY: z.string().min(1).optional(),
+    EMAIL_FROM: z.string().min(1).optional(),
+    WEB_PUSH_PUBLIC_KEY: z.string().min(1).optional(),
+    WEB_PUSH_PRIVATE_KEY: z.string().min(1).optional(),
+    WEB_PUSH_SUBJECT: z
+      .string()
+      .refine((value) => value.startsWith("mailto:") || value.startsWith("https://"))
+      .optional(),
+  })
+  .superRefine((config, context) => {
+    const resendValues = [config.RESEND_API_KEY, config.EMAIL_FROM].filter(Boolean).length;
+    if (resendValues === 1) {
+      context.addIssue({ code: "custom", message: "La configuration Resend doit être complète." });
+    }
+
+    const webPushValues = [
+      config.WEB_PUSH_PUBLIC_KEY,
+      config.WEB_PUSH_PRIVATE_KEY,
+      config.WEB_PUSH_SUBJECT,
+    ].filter(Boolean).length;
+    if (webPushValues > 0 && webPushValues < 3) {
+      context.addIssue({
+        code: "custom",
+        message: "La configuration Web Push doit être complète.",
+      });
+    }
+  });
 
 const parsedEnv = serverEnvSchema.safeParse({
   DATABASE_URL: process.env.DATABASE_URL,
@@ -41,6 +71,7 @@ const parsedEnv = serverEnvSchema.safeParse({
   VERCEL_ENV: process.env.VERCEL_ENV || undefined,
   VERCEL_GIT_COMMIT_SHA: process.env.VERCEL_GIT_COMMIT_SHA || undefined,
   VERCEL_URL: process.env.VERCEL_URL || undefined,
+  VERCEL_BRANCH_URL: process.env.VERCEL_BRANCH_URL || undefined,
   RESEND_API_KEY: process.env.RESEND_API_KEY || undefined,
   EMAIL_FROM: process.env.EMAIL_FROM || undefined,
   WEB_PUSH_PUBLIC_KEY: process.env.WEB_PUSH_PUBLIC_KEY || undefined,

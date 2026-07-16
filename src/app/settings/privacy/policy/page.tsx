@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { AnalyticsConsentSettings } from "@/features/analytics-consent";
 import { requireSession } from "@/features/auth/server";
 import { SettingsLayout } from "@/widgets/settings";
 
@@ -25,6 +26,20 @@ export default async function PrivacyPolicyPage() {
           personnaliser vos conseils et répondre à vos demandes. Les emails techniques de
           vérification ou de récupération sont transmis au prestataire d’envoi configuré par Vintra.
         </PolicySection>
+        <PolicySection title="Hébergement et mesure technique">
+          L’application est hébergée par Vercel et sa base PostgreSQL par Supabase dans l’Union
+          européenne. Si la surveillance est activée, Sentry reçoit uniquement les informations
+          techniques nécessaires au diagnostic, sans corps de requête, cookie ni identité. La mesure
+          d’audience PostHog reste facultative, sans replay, autocapture, texte visible ni
+          identifiant persistant, et ne démarre qu’après votre accord explicite. Aucune réponse
+          financière n’est envoyée à ces outils.
+        </PolicySection>
+        <section className="rounded-3xl border border-border bg-surface p-5 sm:p-8">
+          <h2 className="text-lg font-semibold">Votre choix de mesure d’audience</h2>
+          <div className="mt-4">
+            <AnalyticsConsentSettings />
+          </div>
+        </section>
         <PolicySection title="Conservation et suppression">
           Les données liées au compte sont conservées tant que celui-ci existe. La suppression du
           compte efface les données personnelles et financières associées. Une trace technique

@@ -3,6 +3,7 @@ import Script from "next/script";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 
+import { AnalyticsConsentBanner } from "@/features/analytics-consent";
 import { getApplicationUrl } from "@/shared/config/server";
 import "./globals.css";
 
@@ -30,7 +31,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <Script src="/theme-init.js" strategy="beforeInteractive" />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <AnalyticsConsentBanner />
+      </body>
     </html>
   );
 }

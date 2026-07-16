@@ -32,6 +32,9 @@ Créer deux projets Supabase :
 - `vintra-production` pour les utilisateurs réels ;
 - `vintra-preview` pour les aperçus Vercel et les validations.
 
+Choisir la région européenne de Francfort pour les deux projets. Les fonctions Vercel sont fixées
+à `fra1` dans `vercel.json` afin de rester proches de PostgreSQL.
+
 Pour chaque projet, relever deux chaînes dans **Database > Connect** :
 
 - `DATABASE_URL` : Transaction Pooler, port `6543`, pour l’exécution Vercel ;
@@ -83,7 +86,7 @@ Renseigner les variables dans **Settings > Environment Variables**. Les valeurs 
 | `SENTRY_ORG` | organisation Sentry | organisation Sentry | non |
 | `SENTRY_PROJECT` | projet Sentry | projet Sentry | non |
 | `SENTRY_AUTH_TOKEN` | jeton d’envoi des source maps | jeton d’envoi des source maps | oui |
-| `NEXT_PUBLIC_POSTHOG_KEY` | clé projet PostHog UE | projet de test ou vide | non |
+| `NEXT_PUBLIC_POSTHOG_KEY` | clé projet PostHog UE ou vide tant que la mesure n’est pas activée | projet de test ou vide | non |
 | `NEXT_PUBLIC_POSTHOG_HOST` | `https://eu.i.posthog.com` | même valeur | non |
 | `LOG_LEVEL` | `info` | `info` | non |
 | `APP_VERSION` | version de `package.json` | même version | non |
@@ -96,6 +99,7 @@ Créer un projet Next.js gratuit dans Sentry et un projet UE dans PostHog. Vintr
 
 - n’envoie ni corps de requête, ni cookie, ni en-tête, ni identité à Sentry ;
 - désactive le replay, l’autocapture et la persistance PostHog ;
+- ne démarre PostHog qu’après un accord explicite et révocable de l’utilisateur ;
 - mesure seulement les pages visitées avec un identifiant conservé en mémoire ;
 - masque tous les textes par précaution ;
 - retire les secrets et identifiants sensibles des journaux Pino.
@@ -112,10 +116,14 @@ Le workflow hebdomadaire :
 1. exporte uniquement le schéma applicatif `public` ;
 2. restaure l’export dans un PostgreSQL 17 temporaire ;
 3. vérifie la présence de l’historique Prisma ;
-4. chiffre le fichier en AES-256 ;
-5. conserve uniquement la version chiffrée pendant 14 jours.
+4. chiffre le fichier en AES-256 et génère un HMAC d’intégrité ;
+5. conserve uniquement la version chiffrée et son HMAC pendant 14 jours.
 
 La clé de chiffrement est indispensable pour restaurer une sauvegarde. La perdre rend les archives inutilisables.
+
+Avant déchiffrement, recalculer le HMAC SHA-256 du fichier `.enc` avec
+`BACKUP_ENCRYPTION_KEY` et le comparer au fichier `.enc.hmac`. Ne jamais restaurer une archive
+dont l’intégrité ne correspond pas.
 
 # 7. Validation avant ouverture aux testeurs
 

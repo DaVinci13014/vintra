@@ -7,6 +7,8 @@
 - Ajout des contrôles de santé, de la tâche hebdomadaire et des en-têtes de sécurité.
 - Intégration optionnelle et respectueuse de la vie privée de Sentry, PostHog et Pino.
 - Ajout des contrôles GitHub, des migrations automatiques Vercel et des sauvegardes chiffrées avec test de restauration.
+- Durcissement post-audit : PostCSS corrigé, actions GitHub verrouillées et aperçus Vercel fiabilisés.
+- Isolation des fichiers générés de développement pour que les builds ne perturbent jamais localhost.
 
 ## 0.1.0 — Partie 1
 

@@ -8,7 +8,7 @@ const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
   "child-src 'none'",
-  "connect-src 'self' https://*.ingest.sentry.io https://eu.i.posthog.com https://eu-assets.i.posthog.com",
+  "connect-src 'self' https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io https://eu.i.posthog.com https://eu-assets.i.posthog.com",
   "font-src 'self' data:",
   "form-action 'self'",
   "frame-ancestors 'none'",
@@ -48,18 +48,51 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
+  distDir: isProduction ? ".next" : ".next-dev",
   poweredByHeader: false,
   reactStrictMode: true,
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      ...[
+        "/api/:path*",
+        "/dashboard/:path*",
+        "/goals/:path*",
+        "/notifications/:path*",
+        "/onboarding/:path*",
+        "/profile/:path*",
+        "/recommendations/:path*",
+        "/reinitialiser-mot-de-passe",
+        "/settings/:path*",
+        "/verification-email",
+      ].map((source) => ({
+        source,
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      })),
+    ];
   },
 };
 
-const sentryBuildSchema = z.object({
-  SENTRY_AUTH_TOKEN: z.string().min(1).optional(),
-  SENTRY_ORG: z.string().min(1).optional(),
-  SENTRY_PROJECT: z.string().min(1).optional(),
-});
+const sentryBuildSchema = z
+  .object({
+    SENTRY_AUTH_TOKEN: z.string().min(1).optional(),
+    SENTRY_ORG: z.string().min(1).optional(),
+    SENTRY_PROJECT: z.string().min(1).optional(),
+  })
+  .superRefine((config, context) => {
+    const configuredValues = [
+      config.SENTRY_AUTH_TOKEN,
+      config.SENTRY_ORG,
+      config.SENTRY_PROJECT,
+    ].filter(Boolean).length;
+
+    if (configuredValues > 0 && configuredValues < 3) {
+      context.addIssue({
+        code: "custom",
+        message: "La configuration Sentry de build doit être complète.",
+      });
+    }
+  });
 
 const sentryBuildConfig = sentryBuildSchema.parse({
   SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN || undefined,
@@ -83,6 +116,11 @@ export default withSentryConfig(nextConfig, {
   widenClientFileUpload: canUploadSourceMaps,
   webpack: {
     automaticVercelMonitors: true,
-    treeshake: { removeDebugLogging: true },
+    treeshake: {
+      excludeReplayCompressionWorker: true,
+      excludeReplayIframe: true,
+      excludeReplayShadowDOM: true,
+      removeDebugLogging: true,
+    },
   },
 });

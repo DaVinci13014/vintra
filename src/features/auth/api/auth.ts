@@ -6,7 +6,7 @@ import { nextCookies } from "better-auth/next-js";
 import { prisma } from "@/shared/api/database";
 import { createSecurityNotificationForUser } from "@/entities/notification/server";
 import { sendAuthEmail } from "@/shared/api/email";
-import { getApplicationUrl, serverEnv } from "@/shared/config/server";
+import { getApplicationUrl, getTrustedApplicationOrigins, serverEnv } from "@/shared/config/server";
 import { hashPassword, verifyPassword } from "../lib/password";
 
 const hasEmailProvider = Boolean(serverEnv.RESEND_API_KEY && serverEnv.EMAIL_FROM);
@@ -16,7 +16,7 @@ export const auth = betterAuth({
   appName: "Vintra",
   baseURL: applicationUrl,
   secret: serverEnv.BETTER_AUTH_SECRET,
-  trustedOrigins: [...new Set([applicationUrl, serverEnv.BETTER_AUTH_URL])],
+  trustedOrigins: getTrustedApplicationOrigins(),
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   hooks: {
     before: createAuthMiddleware(async (context) => {
