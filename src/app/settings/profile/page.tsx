@@ -1,9 +1,11 @@
+import { LogOut, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { SignOutButton } from "@/features/auth";
 import { requireSession } from "@/features/auth/server";
 import { getSettingsOverview } from "@/features/settings";
-import { PersonalSettingsForm } from "@/features/settings/ui";
+import { DeleteAccount, PersonalSettingsForm } from "@/features/settings/ui";
 import { SettingsLayout } from "@/widgets/settings";
 
 export default async function SettingsProfilePage() {
@@ -49,6 +51,26 @@ export default async function SettingsProfilePage() {
         >
           Modifier mes informations financières
         </Link>
+      </section>
+
+      <section className="mt-5 rounded-3xl border border-border bg-surface p-5 sm:p-8">
+        <LogOut className="text-brand" aria-hidden="true" />
+        <h2 className="mt-5 text-lg font-semibold">Déconnexion</h2>
+        <p className="mt-2 text-sm leading-6 text-secondary-text">
+          Fermez uniquement la session utilisée sur cet appareil.
+        </p>
+        <div className="mt-5">
+          <SignOutButton />
+        </div>
+      </section>
+
+      <section className="mt-5 rounded-3xl border border-danger/40 bg-danger/5 p-5 sm:p-8">
+        <Trash2 className="text-danger" aria-hidden="true" />
+        <h2 className="mt-5 text-lg font-semibold">Zone dangereuse</h2>
+        <p className="mt-2 text-sm leading-6 text-secondary-text">
+          La suppression efface définitivement vos données et invalide toutes les sessions.
+        </p>
+        <DeleteAccount email={session.user.email} />
       </section>
     </SettingsLayout>
   );

@@ -6,7 +6,6 @@ import {
   Palette,
   ShieldCheck,
   UserRound,
-  WalletCards,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,7 +19,7 @@ const SECTIONS = [
   {
     href: "/settings/profile",
     title: "Mon profil",
-    description: "Identité, photo et informations financières",
+    description: "Identité, finances et gestion du compte",
     icon: UserRound,
   },
   {
@@ -52,12 +51,6 @@ const SECTIONS = [
     title: "Support",
     description: "FAQ, problème ou avis",
     icon: CircleHelp,
-  },
-  {
-    href: "/settings/account",
-    title: "Compte",
-    description: "Déconnexion et suppression",
-    icon: WalletCards,
   },
 ] as const;
 

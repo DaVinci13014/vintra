@@ -15,7 +15,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@/features/auth/server", () => ({
   getSession: vi.fn(async () => ({
-    user: { id: userId, emailVerified: true },
+    user: { id: userId, email: `settings-${userId}@vintra.test`, emailVerified: true },
     session: { token: "current-token" },
   })),
   auth: {
@@ -32,6 +32,7 @@ vi.mock("next/headers", () => ({
   cookies: vi.fn(async () => ({ set: mocks.cookieSet })),
   headers: vi.fn(async () => new Headers()),
 }));
+vi.mock("@/shared/lib/logger", () => ({ logger: { error: vi.fn() } }));
 
 import { prisma } from "@/shared/api/database";
 import { deleteAccount } from "./account-actions";
@@ -188,11 +189,21 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")("paramètres avec Post
     expect(mocks.revokeOtherSessions).toHaveBeenCalledOnce();
     expect(mocks.revokeSessions).toHaveBeenCalledOnce();
 
-    const rejected = await deleteAccount({ confirmation: "supprimer", password: "Nouveau1!" });
+    const rejected = await deleteAccount({
+      reason: "TECHNICAL_ISSUE",
+      feedback: "Le tableau de bord ne répond plus.",
+      confirmation: "supprimer",
+      password: "Nouveau1!",
+    });
     expect(rejected.success).toBe(false);
     expect(mocks.deleteUser).not.toHaveBeenCalled();
 
-    const accepted = await deleteAccount({ confirmation: "SUPPRIMER", password: "Nouveau1!" });
+    const accepted = await deleteAccount({
+      reason: "TECHNICAL_ISSUE",
+      feedback: "Le tableau de bord ne répond plus.",
+      confirmation: "SUPPRIMER",
+      password: "Nouveau1!",
+    });
     expect(accepted.success).toBe(true);
     expect(mocks.deleteUser).toHaveBeenCalledOnce();
   });

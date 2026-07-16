@@ -6,7 +6,6 @@ import {
   Palette,
   ShieldCheck,
   UserRound,
-  WalletCards,
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -25,7 +24,6 @@ const NAVIGATION = [
   { id: "security", href: "/settings/security", label: "Sécurité", icon: LockKeyhole },
   { id: "privacy", href: "/settings/privacy", label: "Confidentialité", icon: ShieldCheck },
   { id: "support", href: "/settings/support", label: "Support", icon: CircleHelp },
-  { id: "account", href: "/settings/account", label: "Compte", icon: WalletCards },
 ] as const;
 
 type SectionId = (typeof NAVIGATION)[number]["id"];

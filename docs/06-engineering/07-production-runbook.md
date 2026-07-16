@@ -79,6 +79,7 @@ Renseigner les variables dans **Settings > Environment Variables**. Les valeurs 
 | `CRON_SECRET` | secret aléatoire de 32 octets | secret distinct | oui |
 | `RESEND_API_KEY` | clé Resend | clé de test ou domaine de test | oui |
 | `EMAIL_FROM` | expéditeur vérifié | expéditeur de test | non |
+| `ACCOUNT_DELETION_FEEDBACK_TO` | adresse recevant les motifs de suppression | adresse de test | non |
 | `WEB_PUSH_PUBLIC_KEY` | clé VAPID publique | clé de test | non |
 | `WEB_PUSH_PRIVATE_KEY` | clé VAPID privée | clé de test | oui |
 | `WEB_PUSH_SUBJECT` | adresse de contact `mailto:` | adresse de contact | non |

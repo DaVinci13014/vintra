@@ -530,7 +530,17 @@ ApiResponse<boolean>
 
 Input
 
-Confirmation utilisateur.
+```ts
+{
+  reason: AccountDeletionReason;
+  feedback: string; // facultatif, 2 000 caractères maximum
+  confirmation: "SUPPRIMER";
+  password: string;
+}
+```
+
+Après une suppression réussie, `reason` et `feedback` sont envoyés à l'adresse de retour configurée.
+Le mot de passe n'est jamais inclus dans l'email.
 
 ---
 

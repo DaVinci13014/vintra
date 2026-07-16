@@ -5,6 +5,7 @@ import {
   localePreferenceSchema,
   themePreferenceSchema,
 } from "@/shared/config";
+import { ACCOUNT_DELETION_REASON_VALUES } from "./account-deletion";
 
 const NAME_PATTERN = /^[\p{L}\p{M}'’ -]+$/u;
 const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
@@ -77,6 +78,11 @@ export const changePasswordSchema = z
   });
 
 export const deleteAccountSchema = z.object({
+  reason: z.enum(ACCOUNT_DELETION_REASON_VALUES),
+  feedback: z
+    .string()
+    .trim()
+    .max(2_000, "Votre commentaire ne peut pas dépasser 2 000 caractères."),
   confirmation: z.literal("SUPPRIMER", { error: "Saisissez SUPPRIMER pour confirmer." }),
   password: z.string().min(1, "Saisissez votre mot de passe actuel."),
 });

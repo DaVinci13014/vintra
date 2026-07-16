@@ -81,6 +81,10 @@ Préférences
 
 ↓
 
+Notifications
+
+↓
+
 Sécurité
 
 ↓
@@ -90,10 +94,6 @@ Confidentialité
 ↓
 
 Support
-
-↓
-
-Compte
 ```
 
 ---
@@ -103,6 +103,8 @@ Compte
 ## Purpose
 
 Permettre à l'utilisateur de modifier ses informations personnelles.
+
+Cette section centralise également les actions de déconnexion et de suppression du compte.
 
 ---
 
@@ -143,6 +145,18 @@ Select
 Currency Inputs
 
 Primary Button
+
+Sign Out Button
+
+Delete Account Dialog
+
+---
+
+## Account Actions
+
+Déconnexion
+
+Supprimer définitivement mon compte
 
 ---
 
@@ -248,29 +262,46 @@ Version de l'application
 
 ---
 
-# SETTINGS_006 — Compte
+# Delete Account
 
-## Actions
+## Retention Flow
 
-Déconnexion
+La suppression suit trois étapes.
 
-Supprimer mon compte
+1. Demander la raison principale du départ.
+2. Proposer une aide ou une action adaptée avec un CTA principal permettant de conserver le compte.
+3. Afficher la confirmation définitive.
+
+L'utilisateur peut toujours poursuivre vers la suppression sans être bloqué.
+
+### Departure Reasons
+
+- Vintra est trop compliqué à utiliser
+- Fonctionnalité importante manquante
+- Problème technique
+- Recommandations inadaptées
+- Inquiétudes concernant les données
+- Vintra n'est plus nécessaire pour le moment
+- Autre raison
 
 ---
 
-# Delete Account
-
-## Confirmation
+## Final Confirmation
 
 Titre
 
-Supprimer définitivement votre compte ?
+Dernière étape avant suppression
 
 Description
 
 Cette action est irréversible.
 
 Toutes vos données seront définitivement supprimées.
+
+Un champ facultatif permet d'ajouter un commentaire libre avant la suppression.
+
+L'interface informe clairement l'utilisateur que le motif et le commentaire sont transmis à
+l'équipe Vintra afin d'améliorer le service.
 
 ---
 
@@ -285,6 +316,12 @@ SUPPRIMER
 ## Components
 
 Confirmation Dialog
+
+Reason Selection
+
+Retention Suggestion
+
+Optional Feedback Textarea
 
 Danger Button
 
@@ -315,6 +352,25 @@ Toutes les données utilisateur sont supprimées.
 BR-004
 
 Toutes les sessions actives sont invalidées.
+
+---
+
+BR-005
+
+Le CTA principal de chaque étape permet de garder le compte ou de résoudre la raison du départ.
+
+---
+
+BR-006
+
+Après une suppression réussie, le motif et le commentaire facultatif sont envoyés à l'adresse de
+retour configurée. Le mot de passe et les données financières ne sont jamais inclus dans cet email.
+
+---
+
+BR-007
+
+Un échec du service d'email ne doit jamais empêcher la suppression du compte.
 
 ---
 

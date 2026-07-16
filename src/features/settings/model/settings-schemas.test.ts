@@ -73,10 +73,28 @@ describe("schémas des paramètres", () => {
 
   it("exige le mot exact pour supprimer le compte", () => {
     expect(
-      deleteAccountSchema.safeParse({ confirmation: "SUPPRIMER", password: "Secret1!" }).success,
+      deleteAccountSchema.safeParse({
+        reason: "NO_LONGER_NEEDED",
+        feedback: "Je reviendrai peut-être plus tard.",
+        confirmation: "SUPPRIMER",
+        password: "Secret1!",
+      }).success,
     ).toBe(true);
     expect(
-      deleteAccountSchema.safeParse({ confirmation: "supprimer", password: "Secret1!" }).success,
+      deleteAccountSchema.safeParse({
+        reason: "NO_LONGER_NEEDED",
+        feedback: "",
+        confirmation: "supprimer",
+        password: "Secret1!",
+      }).success,
+    ).toBe(false);
+    expect(
+      deleteAccountSchema.safeParse({
+        reason: "UNKNOWN",
+        feedback: "",
+        confirmation: "SUPPRIMER",
+        password: "Secret1!",
+      }).success,
     ).toBe(false);
   });
 });

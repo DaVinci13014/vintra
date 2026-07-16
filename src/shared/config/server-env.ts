@@ -34,6 +34,7 @@ const serverEnvSchema = z
       .optional(),
     RESEND_API_KEY: z.string().min(1).optional(),
     EMAIL_FROM: z.string().min(1).optional(),
+    ACCOUNT_DELETION_FEEDBACK_TO: z.email().default("irfanemlboa@gmail.com"),
     WEB_PUSH_PUBLIC_KEY: z.string().min(1).optional(),
     WEB_PUSH_PRIVATE_KEY: z.string().min(1).optional(),
     WEB_PUSH_SUBJECT: z
@@ -74,6 +75,7 @@ const parsedEnv = serverEnvSchema.safeParse({
   VERCEL_BRANCH_URL: process.env.VERCEL_BRANCH_URL || undefined,
   RESEND_API_KEY: process.env.RESEND_API_KEY || undefined,
   EMAIL_FROM: process.env.EMAIL_FROM || undefined,
+  ACCOUNT_DELETION_FEEDBACK_TO: process.env.ACCOUNT_DELETION_FEEDBACK_TO || undefined,
   WEB_PUSH_PUBLIC_KEY: process.env.WEB_PUSH_PUBLIC_KEY || undefined,
   WEB_PUSH_PRIVATE_KEY: process.env.WEB_PUSH_PRIVATE_KEY || undefined,
   WEB_PUSH_SUBJECT: process.env.WEB_PUSH_SUBJECT || undefined,

@@ -8,6 +8,11 @@ export { updatePreferences } from "./api/preferences-actions";
 export { changePassword, revokeAllSessions, revokeOtherSessions } from "./api/security-actions";
 export { createSupportRequest } from "./api/support-actions";
 export {
+  ACCOUNT_DELETION_REASONS,
+  ACCOUNT_RETENTION_SUGGESTIONS,
+  type AccountDeletionReason,
+} from "./model/account-deletion";
+export {
   avatarSchema,
   changePasswordSchema,
   deleteAccountSchema,
