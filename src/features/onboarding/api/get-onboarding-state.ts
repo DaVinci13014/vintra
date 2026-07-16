@@ -3,7 +3,7 @@ import {
   clampOnboardingStep,
   EMPTY_ONBOARDING_VALUES,
   type OnboardingState,
-} from "@/processes/onboarding/model";
+} from "@/features/onboarding/model";
 
 export async function getOnboardingState(userId: string): Promise<OnboardingState> {
   const profile = await prisma.profile.upsert({

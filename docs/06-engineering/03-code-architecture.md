@@ -55,14 +55,6 @@ Les couches sont classées du plus générique au plus spécifique.
 app
 ↓
 
-processes (optionnel)
-
-↓
-
-pages
-
-↓
-
 widgets
 
 ↓
@@ -90,8 +82,6 @@ src/
 
 app/
 
-pages/
-
 widgets/
 
 features/
@@ -99,8 +89,6 @@ features/
 entities/
 
 shared/
-
-processes/
 
 ```
 
@@ -128,11 +116,14 @@ Ne contient jamais :
 
 ---
 
-# pages/
+# `app/**/page.tsx`
 
 Responsabilité :
 
 Assembler les widgets.
+
+La couche FSD `pages` n'est pas matérialisée dans `src/pages`, car ce chemin activerait le Pages
+Router de Next.js.
 
 Une page :
 
@@ -260,15 +251,11 @@ Shared ne connaît jamais les couches supérieures.
 
 ---
 
-# processes/
+# Workflows longs
 
-Optionnel.
-
-Utilisé uniquement pour les workflows complexes.
-
-Exemple
-
-Onboarding complet.
+Les workflows comme l'onboarding restent des slices de `features/`. Les fichiers
+`src/app/**/page.tsx` assemblent ces fonctionnalités à travers des widgets lorsque l'écran devient
+composé.
 
 ---
 

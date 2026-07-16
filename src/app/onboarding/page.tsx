@@ -1,6 +1,6 @@
 import { EmailVerificationGate, SignOutButton } from "@/features/auth";
 import { requireSession } from "@/features/auth/server";
-import { getOnboardingState, OnboardingFlow } from "@/processes/onboarding";
+import { getOnboardingState, OnboardingFlow } from "@/features/onboarding";
 import { Logo } from "@/shared/ui";
 import { redirect } from "next/navigation";
 

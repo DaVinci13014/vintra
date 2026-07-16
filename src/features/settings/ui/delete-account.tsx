@@ -14,7 +14,7 @@ import {
   deleteAccountSchema,
   type AccountDeletionReason,
 } from "@/features/settings/client";
-import { Button, Field, Input } from "@/shared/ui";
+import { Button, FeedbackMessage, Field, Input } from "@/shared/ui";
 
 type DeleteStep = "reason" | "retention" | "confirmation";
 
@@ -275,14 +275,7 @@ export function DeleteAccount({ email }: { email: string }) {
                     </Field>
                   </div>
 
-                  {error && (
-                    <p
-                      className="mt-5 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
-                      role="alert"
-                    >
-                      {error}
-                    </p>
-                  )}
+                  <FeedbackMessage className="mt-5" error={error} />
 
                   <div className="mt-7 grid gap-3">
                     <Button type="button" disabled={isPending} onClick={closeDialog}>

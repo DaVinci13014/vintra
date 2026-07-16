@@ -13,7 +13,7 @@ import {
   SUMMARY_STEP,
   validateOnboardingStep,
   type OnboardingValues,
-} from "@/processes/onboarding/model";
+} from "@/features/onboarding/model";
 
 const saveStepInputSchema = z.object({
   step: z.number().int().min(1).max(26),

@@ -7,7 +7,7 @@ import {
   supportRequestSchema,
   type SupportRequestInput,
 } from "@/features/settings/client";
-import { Button, Field } from "@/shared/ui";
+import { Button, FeedbackMessage, Field } from "@/shared/ui";
 
 const INITIAL_VALUES: SupportRequestInput = { type: "CONTACT", message: "" };
 
@@ -71,18 +71,7 @@ export function SupportForm() {
           />
         </Field>
       </div>
-      {(message || error) && (
-        <p
-          className={`mt-5 rounded-xl border p-3 text-sm ${
-            error
-              ? "border-danger/40 bg-danger/10 text-danger"
-              : "border-success/40 bg-success/10 text-success"
-          }`}
-          role={error ? "alert" : "status"}
-        >
-          {error ?? message}
-        </p>
-      )}
+      <FeedbackMessage className="mt-5" error={error} message={message} />
       <Button type="submit" className="mt-6" disabled={isPending}>
         {isPending ? "Envoi..." : "Envoyer ma demande"}
       </Button>

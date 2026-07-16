@@ -1,6 +1,5 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import { ImagePlus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
@@ -12,7 +11,7 @@ import {
   updatePersonalSettings,
   type PersonalSettingsInput,
 } from "@/features/settings/client";
-import { Avatar, Button, ConfirmationDialog, Field, Input } from "@/shared/ui";
+import { Avatar, Button, ConfirmationDialog, FeedbackMessage, Field, Input } from "@/shared/ui";
 
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -260,24 +259,7 @@ export function PersonalSettingsForm({
         </div>
       </form>
 
-      <AnimatePresence initial={false} mode="wait">
-        {(message || error) && (
-          <motion.p
-            key={error ? "error" : "success"}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className={`rounded-xl border p-3 text-sm ${
-              error
-                ? "border-danger/40 bg-danger/10 text-danger"
-                : "border-success/40 bg-success/10 text-success"
-            }`}
-            role={error ? "alert" : "status"}
-          >
-            {error ?? message}
-          </motion.p>
-        )}
-      </AnimatePresence>
+      <FeedbackMessage error={error} message={message} />
       <ConfirmationDialog
         open={Boolean(confirmation)}
         title={

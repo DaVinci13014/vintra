@@ -1,7 +1,7 @@
 import { Check } from "lucide-react";
 
 import { cn } from "@/shared/lib";
-import type { Choice } from "@/processes/onboarding/model";
+import type { Choice } from "@/features/onboarding/model";
 
 type ChoiceGroupProps = {
   choices: Choice[];

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { createGoal, goalInputSchema, updateGoal, type GoalInput } from "@/features/goals/client";
-import { Button, ConfirmationDialog, Field, Input } from "@/shared/ui";
+import { Button, ConfirmationDialog, FeedbackMessage, Field, Input } from "@/shared/ui";
 
 export function GoalForm({
   goalId,
@@ -99,14 +99,7 @@ export function GoalForm({
             className="w-full resize-none rounded-xl border border-border bg-card px-4 py-3 text-foreground outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
           />
         </Field>
-        {error && (
-          <p
-            className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
-            role="alert"
-          >
-            {error}
-          </p>
-        )}
+        <FeedbackMessage error={error} />
         <Button type="submit" size="lg" disabled={isPending}>
           {isPending
             ? "Enregistrement..."

@@ -3,7 +3,7 @@
 import { MapPin, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import { COUNTRY_OPTIONS } from "@/processes/onboarding/model";
+import { COUNTRY_OPTIONS } from "@/features/onboarding/model";
 import { Input } from "@/shared/ui";
 
 type CountryComboboxProps = {

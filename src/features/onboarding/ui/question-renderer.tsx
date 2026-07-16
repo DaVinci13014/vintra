@@ -4,7 +4,7 @@ import {
   YES_NO_CHOICES,
   type OnboardingFieldSetter,
   type OnboardingValues,
-} from "@/processes/onboarding/model";
+} from "@/features/onboarding/model";
 import { ChoiceGroup } from "./choice-group";
 import { CountryCombobox } from "./country-combobox";
 import { CurrencyField } from "./currency-field";

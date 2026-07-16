@@ -12,7 +12,7 @@ import {
   revokeOtherSessions as revokeOtherSessionsAction,
   type ChangePasswordInput,
 } from "@/features/settings/client";
-import { Button, ConfirmationDialog, Field, Input } from "@/shared/ui";
+import { Button, ConfirmationDialog, FeedbackMessage, Field, Input } from "@/shared/ui";
 
 type SessionView = {
   id: string;
@@ -209,18 +209,7 @@ export function SecuritySettings({ sessions }: { sessions: SessionView[] }) {
         </div>
       </section>
 
-      {(message || error) && (
-        <p
-          className={`rounded-xl border p-3 text-sm ${
-            error
-              ? "border-danger/40 bg-danger/10 text-danger"
-              : "border-success/40 bg-success/10 text-success"
-          }`}
-          role={error ? "alert" : "status"}
-        >
-          {error ?? message}
-        </p>
-      )}
+      <FeedbackMessage error={error} message={message} />
 
       <ConfirmationDialog
         open={Boolean(pendingPasswords)}

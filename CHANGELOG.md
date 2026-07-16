@@ -9,6 +9,12 @@
 - Ajout des contrôles GitHub, des migrations automatiques Vercel et des sauvegardes chiffrées avec test de restauration.
 - Durcissement post-audit : PostCSS corrigé, actions GitHub verrouillées et aperçus Vercel fiabilisés.
 - Isolation des fichiers générés de développement pour que les builds ne perturbent jamais localhost.
+- Démarrage local rendu idempotent lorsque Vintra utilise déjà son port de développement.
+- Actualisation systématique des données après une action et lors d’un retour dans l’historique.
+- Confirmation ajoutée avant chaque modification personnelle, financière ou de sécurité sensible.
+- Refonte monochrome blanc/gris et affichage de la photo de profil, avec initiales en remplacement.
+- Harmonisation des erreurs, simplification des textes et de l’ajout de versement.
+- Nettoyage FSD de l’onboarding, centralisation des retours de formulaire et retrait des dépendances directes redondantes.
 
 ## 0.1.0 — Partie 1
 

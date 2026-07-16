@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { Button, Field, Input } from "@/shared/ui";
+import { Button, FeedbackMessage, Field, Input } from "@/shared/ui";
 import { authClient } from "../api/auth-client";
 import { isEmailAlreadyUsed } from "../lib/auth-error-message";
 import { signUpSchema, type SignUpValues } from "../model/auth-schemas";
@@ -127,14 +127,7 @@ export function SignUpForm() {
         />
       </Field>
 
-      {submissionError && (
-        <p
-          className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
-          role="alert"
-        >
-          {submissionError}
-        </p>
-      )}
+      <FeedbackMessage error={submissionError} />
 
       <Button type="submit" size="lg" disabled={!isValid || isSubmitting}>
         {isSubmitting ? "Création..." : "Créer mon compte"}

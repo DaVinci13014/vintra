@@ -8,7 +8,7 @@ import {
   updateFinancialProfile,
   type FinancialProfileInput,
 } from "@/features/financial-profile/client";
-import { Button, ConfirmationDialog, Field, Input } from "@/shared/ui";
+import { Button, ConfirmationDialog, FeedbackMessage, Field, Input } from "@/shared/ui";
 
 const EXPENSES: Array<{ key: keyof FinancialProfileInput; label: string }> = [
   { key: "housingExpense", label: "Logement" },
@@ -129,14 +129,7 @@ export function FinancialProfileForm({
             onChange={(value) => amount("monthlySavings", value)}
           />
         </Section>
-        {error && (
-          <p
-            className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
-            role="alert"
-          >
-            {error}
-          </p>
-        )}
+        <FeedbackMessage error={error} />
         <div className="sticky bottom-4 rounded-2xl border border-border bg-background/90 p-3 backdrop-blur">
           <Button type="submit" size="lg" className="w-full" disabled={isPending}>
             {isPending ? "Nouvelle analyse en cours..." : "Enregistrer et recalculer"}

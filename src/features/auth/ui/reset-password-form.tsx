@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { Button, Field } from "@/shared/ui";
+import { Button, FeedbackMessage, Field } from "@/shared/ui";
 import { authClient } from "../api/auth-client";
 import { resetPasswordSchema, type ResetPasswordValues } from "../model/auth-schemas";
 import { PasswordInput } from "./password-input";
@@ -89,14 +89,7 @@ export function ResetPasswordForm({ token, isInvalidToken = false }: ResetPasswo
           {...register("confirmPassword")}
         />
       </Field>
-      {submissionError && (
-        <p
-          className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
-          role="alert"
-        >
-          {submissionError}
-        </p>
-      )}
+      <FeedbackMessage error={submissionError} />
       <Button type="submit" size="lg" disabled={!isValid || isSubmitting}>
         {isSubmitting ? "Modification..." : "Modifier le mot de passe"}
       </Button>

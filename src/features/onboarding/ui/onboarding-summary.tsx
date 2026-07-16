@@ -11,7 +11,7 @@ import {
   INSTALLMENT_CHOICES,
   PROFESSION_CHOICES,
   type OnboardingValues,
-} from "@/processes/onboarding/model";
+} from "@/features/onboarding/model";
 
 type OnboardingSummaryProps = {
   values: OnboardingValues;

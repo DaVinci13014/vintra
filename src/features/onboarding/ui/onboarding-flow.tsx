@@ -16,8 +16,8 @@ import {
   type OnboardingFieldSetter,
   type OnboardingState,
   type OnboardingValues,
-} from "@/processes/onboarding/model";
-import { Button } from "@/shared/ui";
+} from "@/features/onboarding/model";
+import { Button, FeedbackMessage } from "@/shared/ui";
 import {
   completeOnboardingAnalysis,
   markQuestionnaireReady,
@@ -196,14 +196,7 @@ export function OnboardingFlow({ initialState, firstName }: OnboardingFlowProps)
             )}
           </motion.div>
 
-          {errorMessage && (
-            <p
-              className="mt-6 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
-              role="alert"
-            >
-              {errorMessage}
-            </p>
-          )}
+          <FeedbackMessage className="mt-6" error={errorMessage} />
         </div>
 
         {currentStep < READY_FOR_ANALYSIS_STEP && (

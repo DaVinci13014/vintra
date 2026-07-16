@@ -9,7 +9,7 @@ import {
   updatePreferences,
   type PreferencesInput,
 } from "@/features/settings/client";
-import { ConfirmationDialog, Field } from "@/shared/ui";
+import { ConfirmationDialog, FeedbackMessage, Field } from "@/shared/ui";
 
 const THEMES = [
   { value: "LIGHT", label: "Clair", icon: Sun },
@@ -166,18 +166,7 @@ export function PreferencesForm({ initialValues }: { initialValues: PreferencesI
         </div>
       </section>
 
-      {(message || error || isPending) && (
-        <p
-          className={`rounded-xl border p-3 text-sm ${
-            error
-              ? "border-danger/40 bg-danger/10 text-danger"
-              : "border-success/40 bg-success/10 text-success"
-          }`}
-          role={error ? "alert" : "status"}
-        >
-          {error ?? (isPending ? "Enregistrement..." : message)}
-        </p>
-      )}
+      <FeedbackMessage error={error} message={isPending ? "Enregistrement..." : message} />
       <ConfirmationDialog
         open={Boolean(pendingCurrency)}
         title="Changer la devise d’affichage ?"

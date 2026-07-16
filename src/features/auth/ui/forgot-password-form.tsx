@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { Button, Field, Input } from "@/shared/ui";
+import { Button, FeedbackMessage, Field, Input } from "@/shared/ui";
 import { authClient } from "../api/auth-client";
 import { forgotPasswordSchema, type ForgotPasswordValues } from "../model/auth-schemas";
 
@@ -57,14 +57,7 @@ export function ForgotPasswordForm() {
           Si cette adresse est associée à un compte, un lien vient d’être envoyé.
         </p>
       )}
-      {submissionError && (
-        <p
-          className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger"
-          role="alert"
-        >
-          {submissionError}
-        </p>
-      )}
+      <FeedbackMessage error={submissionError} />
       <Button type="submit" size="lg" disabled={!isValid || isSubmitting}>
         {isSubmitting ? "Envoi..." : "Envoyer le lien"}
       </Button>
