@@ -11,6 +11,9 @@ pnpm dev
 
 Ouvrir ensuite [http://localhost:13015](http://localhost:13015).
 
+Si Vintra utilise déjà ce port, la commande confirme simplement que le site est accessible au
+lieu de lancer un second serveur concurrent.
+
 ## Emails de confirmation
 
 Vintra utilise Resend pour les emails de vérification d’adresse et de récupération de mot de passe.

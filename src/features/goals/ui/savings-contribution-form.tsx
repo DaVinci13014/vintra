@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, CheckCircle2, PartyPopper, PiggyBank, X } from "lucide-react";
+import { Check, CheckCircle2, PartyPopper, Plus, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
@@ -61,14 +61,13 @@ export function SavingsContributionForm({
         return;
       }
       setAmount("");
+      router.refresh();
       if (response.data.completed) {
         setCelebration({
           currentAmount: response.data.currentAmount,
           targetAmount: response.data.targetAmount,
           title: response.data.title,
         });
-      } else {
-        router.refresh();
       }
     });
   }
@@ -123,8 +122,8 @@ export function SavingsContributionForm({
             </div>
           </Field>
           <Button type="submit" size="lg" disabled={isPending}>
-            <PiggyBank size={18} aria-hidden="true" />
-            {isPending ? "Ajout en cours..." : "Ajouter à mon épargne"}
+            <Plus size={18} aria-hidden="true" />
+            {isPending ? "Ajout en cours..." : "Ajouter un versement"}
           </Button>
         </form>
       )}

@@ -23,11 +23,7 @@ export default async function GoalSavingsPage({ params }: { params: Promise<{ go
     <GoalsLayout backHref={"/goals/" + goal.id}>
       <div className="mx-auto max-w-3xl">
         <p className="text-sm font-medium text-brand">Objectif principal</p>
-        <h1 className="mt-2 text-3xl font-semibold sm:text-5xl">Faire progresser mon épargne</h1>
-        <p className="mt-4 max-w-2xl leading-7 text-secondary-text">
-          Ajoutez chaque somme mise de côté. Votre objectif et la courbe d’épargne se mettent à jour
-          automatiquement.
-        </p>
+        <h1 className="mt-2 text-3xl font-semibold sm:text-5xl">Ajouter un versement</h1>
 
         <section className="mt-8 rounded-3xl border border-border bg-surface p-5 sm:p-8">
           <div className="flex items-start justify-between gap-4">

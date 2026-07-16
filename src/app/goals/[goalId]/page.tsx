@@ -1,4 +1,4 @@
-import { CalendarClock, Pencil, PiggyBank, Target } from "lucide-react";
+import { CalendarClock, Pencil, PiggyBank, Plus, Target } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -37,8 +37,12 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ goa
                 href={`/goals/${goal.id}/epargne`}
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-foreground px-5 text-sm font-medium text-background transition hover:bg-brand hover:text-brand-foreground"
               >
-                <PiggyBank size={17} aria-hidden="true" />
-                {goal.status === "COMPLETED" ? "Voir les versements" : "Ajouter de l’épargne"}
+                {goal.status === "COMPLETED" ? (
+                  <PiggyBank size={17} aria-hidden="true" />
+                ) : (
+                  <Plus size={17} aria-hidden="true" />
+                )}
+                {goal.status === "COMPLETED" ? "Voir les versements" : "Ajouter un versement"}
               </Link>
             )}
             <Link

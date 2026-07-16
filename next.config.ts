@@ -47,7 +47,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["127.0.0.1"],
+  allowedDevOrigins: ["localhost", "127.0.0.1"],
   distDir: isProduction ? ".next" : ".next-dev",
   poweredByHeader: false,
   reactStrictMode: true,

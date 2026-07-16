@@ -9,7 +9,7 @@ import {
   updatePreferences,
   type PreferencesInput,
 } from "@/features/settings/client";
-import { Field } from "@/shared/ui";
+import { ConfirmationDialog, Field } from "@/shared/ui";
 
 const THEMES = [
   { value: "LIGHT", label: "Clair", icon: Sun },
@@ -28,6 +28,7 @@ const CURRENCIES = [
 export function PreferencesForm({ initialValues }: { initialValues: PreferencesInput }) {
   const router = useRouter();
   const [values, setValues] = useState(initialValues);
+  const [pendingCurrency, setPendingCurrency] = useState<PreferencesInput | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -52,6 +53,37 @@ export function PreferencesForm({ initialValues }: { initialValues: PreferencesI
         setError(response.error.message);
         return;
       }
+      setMessage("Préférences enregistrées.");
+      router.refresh();
+    });
+  }
+
+  function requestCurrencyChange(currency: PreferencesInput["currency"]) {
+    const parsed = preferencesSchema.safeParse({ ...values, currency });
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? "Vérifiez vos préférences.");
+      return;
+    }
+
+    setError(null);
+    setPendingCurrency(parsed.data);
+  }
+
+  function confirmCurrencyChange() {
+    if (!pendingCurrency) return;
+    const previousValues = values;
+    const nextValues = pendingCurrency;
+    setValues(nextValues);
+    setMessage(null);
+    startTransition(async () => {
+      const response = await updatePreferences(nextValues);
+      if (!response.success) {
+        setValues(previousValues);
+        setPendingCurrency(null);
+        setError(response.error.message);
+        return;
+      }
+      setPendingCurrency(null);
       setMessage("Préférences enregistrées.");
       router.refresh();
     });
@@ -120,7 +152,7 @@ export function PreferencesForm({ initialValues }: { initialValues: PreferencesI
               value={values.currency}
               disabled={isPending}
               onChange={(event) =>
-                save({ ...values, currency: event.target.value as PreferencesInput["currency"] })
+                requestCurrencyChange(event.target.value as PreferencesInput["currency"])
               }
               className="h-12 w-full rounded-xl border border-border bg-card px-4"
             >
@@ -146,6 +178,14 @@ export function PreferencesForm({ initialValues }: { initialValues: PreferencesI
           {error ?? (isPending ? "Enregistrement..." : message)}
         </p>
       )}
+      <ConfirmationDialog
+        open={Boolean(pendingCurrency)}
+        title="Changer la devise d’affichage ?"
+        description="Les montants existants garderont leur valeur et seront affichés avec la nouvelle devise."
+        pending={isPending}
+        onCancel={() => setPendingCurrency(null)}
+        onConfirm={confirmCurrencyChange}
+      />
     </div>
   );
 }

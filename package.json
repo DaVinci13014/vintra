@@ -8,7 +8,7 @@
     "node": ">=24 <25"
   },
   "scripts": {
-    "dev": "next dev --turbopack --hostname 127.0.0.1 --port 13015",
+    "dev": "node scripts/dev.mjs",
     "build": "next build",
     "build:deploy": "pnpm db:deploy && next build",
     "start": "next start",

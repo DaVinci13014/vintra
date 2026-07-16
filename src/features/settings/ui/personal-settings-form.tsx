@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ImagePlus, Trash2 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 
 import {
@@ -12,7 +13,7 @@ import {
   updatePersonalSettings,
   type PersonalSettingsInput,
 } from "@/features/settings/client";
-import { Button, Field, Input } from "@/shared/ui";
+import { Button, ConfirmationDialog, Field, Input } from "@/shared/ui";
 
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -34,9 +35,15 @@ export function PersonalSettingsForm({
   initialValues: PersonalSettingsInput;
   initialImage: string | null;
 }) {
+  const router = useRouter();
   const fileInput = useRef<HTMLInputElement>(null);
   const [values, setValues] = useState(initialValues);
   const [image, setImage] = useState(initialImage);
+  const [confirmation, setConfirmation] = useState<"profile" | "avatar" | "removeAvatar" | null>(
+    null,
+  );
+  const [pendingProfile, setPendingProfile] = useState<PersonalSettingsInput | null>(null);
+  const [pendingAvatar, setPendingAvatar] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPreparingImage, setIsPreparingImage] = useState(false);
@@ -52,14 +59,24 @@ export function PersonalSettingsForm({
       return;
     }
 
+    setError(null);
+    setPendingProfile(parsed.data);
+    setConfirmation("profile");
+  }
+
+  function saveProfile() {
+    if (!pendingProfile) return;
     startTransition(async () => {
-      const response = await updatePersonalSettings(parsed.data);
+      const response = await updatePersonalSettings(pendingProfile);
       if (!response.success) {
         setError(response.error.message);
+        closeConfirmation();
         return;
       }
       setError(null);
       setMessage("Profil mis à jour.");
+      closeConfirmation();
+      router.refresh();
     });
   }
 
@@ -81,20 +98,31 @@ export function PersonalSettingsForm({
     setIsPreparingImage(true);
     try {
       const dataUrl = await compressAvatar(file);
-      startTransition(async () => {
-        const response = await updateAvatar({ dataUrl });
-        if (!response.success) {
-          setError(response.error.message);
-          return;
-        }
-        setImage(response.data.image);
-        setMessage("Photo de profil mise à jour.");
-      });
+      setPendingAvatar(dataUrl);
+      setConfirmation("avatar");
     } catch {
       setError("L’image n’a pas pu être préparée.");
     } finally {
       setIsPreparingImage(false);
     }
+  }
+
+  function saveAvatar() {
+    if (!pendingAvatar) return;
+    setMessage(null);
+    setError(null);
+    startTransition(async () => {
+      const response = await updateAvatar({ dataUrl: pendingAvatar });
+      if (!response.success) {
+        setError(response.error.message);
+        closeConfirmation();
+        return;
+      }
+      setImage(response.data.image);
+      setMessage("Photo de profil mise à jour.");
+      closeConfirmation();
+      router.refresh();
+    });
   }
 
   function deleteAvatar() {
@@ -104,11 +132,26 @@ export function PersonalSettingsForm({
       const response = await removeAvatar();
       if (!response.success) {
         setError(response.error.message);
+        closeConfirmation();
         return;
       }
       setImage(null);
       setMessage("Photo de profil supprimée.");
+      closeConfirmation();
+      router.refresh();
     });
+  }
+
+  function closeConfirmation() {
+    setConfirmation(null);
+    setPendingProfile(null);
+    setPendingAvatar(null);
+  }
+
+  function confirmChange() {
+    if (confirmation === "profile") saveProfile();
+    if (confirmation === "avatar") saveAvatar();
+    if (confirmation === "removeAvatar") deleteAvatar();
   }
 
   return (
@@ -150,7 +193,12 @@ export function PersonalSettingsForm({
               {isPreparingImage ? "Préparation..." : "Choisir une photo"}
             </Button>
             {image && (
-              <Button type="button" variant="ghost" disabled={isBusy} onClick={deleteAvatar}>
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={isBusy}
+                onClick={() => setConfirmation("removeAvatar")}
+              >
                 <Trash2 size={18} aria-hidden="true" />
                 Supprimer
               </Button>
@@ -244,6 +292,30 @@ export function PersonalSettingsForm({
           </motion.p>
         )}
       </AnimatePresence>
+      <ConfirmationDialog
+        open={Boolean(confirmation)}
+        title={
+          confirmation === "profile"
+            ? "Modifier vos informations personnelles ?"
+            : confirmation === "removeAvatar"
+              ? "Supprimer votre photo de profil ?"
+              : "Utiliser cette photo de profil ?"
+        }
+        description={
+          confirmation === "profile"
+            ? "Ces informations seront utilisées dans l’ensemble de votre espace Vintra."
+            : confirmation === "removeAvatar"
+              ? "Vos initiales remplaceront la photo dans la navigation."
+              : "Cette photo apparaîtra dans la navigation et sur votre profil."
+        }
+        confirmLabel={
+          confirmation === "removeAvatar" ? "Supprimer la photo" : "Accepter les modifications"
+        }
+        pending={isPending}
+        danger={confirmation === "removeAvatar"}
+        onCancel={closeConfirmation}
+        onConfirm={confirmChange}
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { GeistSans } from "geist/font/sans";
 
 import { AnalyticsConsentBanner } from "@/features/analytics-consent";
 import { getApplicationUrl } from "@/shared/config/server";
+import { RefreshOnHistoryNavigation } from "@/shared/lib";
 import "./globals.css";
 
 const applicationUrl = getApplicationUrl();
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Script src="/theme-init.js" strategy="beforeInteractive" />
       </head>
       <body>
+        <RefreshOnHistoryNavigation />
         {children}
         <AnalyticsConsentBanner />
       </body>

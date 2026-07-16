@@ -12,7 +12,7 @@ import {
   revokeOtherSessions as revokeOtherSessionsAction,
   type ChangePasswordInput,
 } from "@/features/settings/client";
-import { Button, Field, Input } from "@/shared/ui";
+import { Button, ConfirmationDialog, Field, Input } from "@/shared/ui";
 
 type SessionView = {
   id: string;
@@ -32,6 +32,7 @@ const EMPTY_PASSWORDS: ChangePasswordInput = {
 export function SecuritySettings({ sessions }: { sessions: SessionView[] }) {
   const router = useRouter();
   const [passwords, setPasswords] = useState(EMPTY_PASSWORDS);
+  const [pendingPasswords, setPendingPasswords] = useState<ChangePasswordInput | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmAllSessions, setConfirmAllSessions] = useState(false);
@@ -47,13 +48,21 @@ export function SecuritySettings({ sessions }: { sessions: SessionView[] }) {
       return;
     }
 
+    setError(null);
+    setPendingPasswords(parsed.data);
+  }
+
+  function confirmPasswordChange() {
+    if (!pendingPasswords) return;
     startTransition(async () => {
-      const response = await changePassword(parsed.data);
+      const response = await changePassword(pendingPasswords);
       if (!response.success) {
         setError(response.error.message);
+        setPendingPasswords(null);
         return;
       }
       setPasswords(EMPTY_PASSWORDS);
+      setPendingPasswords(null);
       setError(null);
       setMessage("Mot de passe modifié. Les autres sessions ont été fermées.");
       router.refresh();
@@ -213,40 +222,26 @@ export function SecuritySettings({ sessions }: { sessions: SessionView[] }) {
         </p>
       )}
 
-      {confirmAllSessions && (
-        <div
-          className="fixed inset-0 z-50 grid place-items-center bg-background/80 px-4 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="revoke-sessions-title"
-          onKeyDown={(event) => {
-            if (event.key === "Escape" && !isPending) setConfirmAllSessions(false);
-          }}
-        >
-          <div className="w-full max-w-md rounded-3xl border border-border bg-surface p-6 shadow-2xl">
-            <h2 id="revoke-sessions-title" className="text-xl font-semibold">
-              Déconnecter tous les appareils ?
-            </h2>
-            <p className="mt-3 text-sm leading-6 text-secondary-text">
-              Vous devrez vous reconnecter sur cet appareil et sur tous les autres.
-            </p>
-            <div className="mt-6 flex justify-end gap-3">
-              <Button
-                type="button"
-                variant="ghost"
-                autoFocus
-                disabled={isPending}
-                onClick={() => setConfirmAllSessions(false)}
-              >
-                Annuler
-              </Button>
-              <Button type="button" disabled={isPending} onClick={revokeEverySession}>
-                {isPending ? "Déconnexion..." : "Tout déconnecter"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmationDialog
+        open={Boolean(pendingPasswords)}
+        title="Modifier votre mot de passe ?"
+        description="Votre nouveau mot de passe sera appliqué immédiatement et les autres sessions seront fermées."
+        pending={isPending}
+        pendingLabel="Modification..."
+        onCancel={() => setPendingPasswords(null)}
+        onConfirm={confirmPasswordChange}
+      />
+      <ConfirmationDialog
+        open={confirmAllSessions}
+        title="Déconnecter tous les appareils ?"
+        description="Vous devrez vous reconnecter sur cet appareil et sur tous les autres."
+        confirmLabel="Tout déconnecter"
+        pendingLabel="Déconnexion..."
+        danger
+        pending={isPending}
+        onCancel={() => setConfirmAllSessions(false)}
+        onConfirm={revokeEverySession}
+      />
     </div>
   );
 }
