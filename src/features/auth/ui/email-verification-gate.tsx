@@ -64,7 +64,7 @@ export function EmailVerificationGate({ email }: EmailVerificationGateProps) {
   async function signOut() {
     setIsSigningOut(true);
     await authClient.signOut();
-    router.replace("/connexion");
+    router.replace("/");
     router.refresh();
   }
 

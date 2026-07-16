@@ -11,7 +11,7 @@ export default async function OnboardingPage() {
     return (
       <main className="flex min-h-svh flex-col bg-background px-4 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
         <header className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4">
-          <Logo priority />
+          <Logo href="/onboarding" priority />
           <SignOutButton />
         </header>
         <EmailVerificationGate email={session.user.email} />
@@ -25,7 +25,7 @@ export default async function OnboardingPage() {
   return (
     <main className="flex min-h-svh flex-col bg-background px-4 pb-6 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
       <header className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4">
-        <Logo priority />
+        <Logo href="/onboarding" priority />
         <SignOutButton />
       </header>
       <OnboardingFlow initialState={initialState} firstName={session.user.firstName} />

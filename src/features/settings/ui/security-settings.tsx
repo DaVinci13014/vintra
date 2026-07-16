@@ -85,7 +85,7 @@ export function SecuritySettings({ sessions }: { sessions: SessionView[] }) {
         return;
       }
       await authClient.signOut();
-      router.replace("/connexion");
+      router.replace("/");
       router.refresh();
     });
   }

@@ -52,7 +52,7 @@ export function DashboardPage({
     <main className="min-h-svh bg-background pb-24">
       <header className="sticky top-0 z-20 border-b border-border/70 bg-background/90 px-4 py-4 backdrop-blur sm:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <Logo priority />
+          <Logo href="/dashboard" priority />
           <nav className="flex items-center gap-2" aria-label="Actions du compte">
             <NotificationBell initialCount={data.unreadNotificationCount} />
             <Link

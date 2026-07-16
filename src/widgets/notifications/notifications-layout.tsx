@@ -8,7 +8,7 @@ export function NotificationsLayout({ children }: { children: ReactNode }) {
   return (
     <main className="min-h-svh bg-background px-4 py-4 sm:px-8 sm:py-6">
       <header className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-        <Logo priority />
+        <Logo href="/dashboard" priority />
         <nav className="flex items-center gap-2" aria-label="Actions des notifications">
           <Link
             href="/settings/notifications"

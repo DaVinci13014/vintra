@@ -25,9 +25,9 @@ export async function signOut(): Promise<ApiResponse<{ destination: string }>> {
         data: { userId: session.user.id, action: "SIGNED_OUT" },
       });
     } catch {
-      return { success: true, data: { destination: "/connexion" } };
+      return { success: true, data: { destination: "/" } };
     }
   }
 
-  return { success: true, data: { destination: "/connexion" } };
+  return { success: true, data: { destination: "/" } };
 }
