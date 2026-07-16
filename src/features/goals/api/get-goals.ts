@@ -50,3 +50,38 @@ export async function getGoal(userId: string, id: string) {
     recommendedMonthlySaving: plan?.recommendedMonthlySaving.toNumber() ?? 0,
   };
 }
+
+export async function getGoalSavings(userId: string, id: string) {
+  const goal = await prisma.goal.findFirst({
+    where: { id, profile: { userId } },
+    select: {
+      id: true,
+      title: true,
+      targetAmount: true,
+      currentAmount: true,
+      progress: true,
+      status: true,
+      profile: { select: { currency: true } },
+      contributions: {
+        orderBy: { createdAt: "desc" },
+        select: { id: true, amount: true, createdAt: true },
+      },
+    },
+  });
+  if (!goal) return null;
+
+  return {
+    id: goal.id,
+    title: goal.title,
+    targetAmount: goal.targetAmount.toNumber(),
+    currentAmount: goal.currentAmount.toNumber(),
+    progress: goal.progress.toNumber(),
+    status: goal.status,
+    currency: goal.profile.currency,
+    contributions: goal.contributions.map((contribution) => ({
+      ...contribution,
+      amount: contribution.amount.toNumber(),
+      createdAt: contribution.createdAt.toISOString(),
+    })),
+  };
+}

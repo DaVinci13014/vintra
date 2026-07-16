@@ -16,9 +16,25 @@ export const goalInputSchema = z.object({
 
 export type GoalInput = z.infer<typeof goalInputSchema>;
 
+export const savingsContributionInputSchema = z.object({
+  goalId: z.string().uuid("Cet objectif n’est pas valide."),
+  amount: z
+    .number()
+    .finite()
+    .positive("Indiquez un montant supérieur à 0 €.")
+    .max(100_000_000, "Le montant saisi est trop élevé.")
+    .refine(hasAtMostTwoDecimals, "Utilisez au maximum deux chiffres après la virgule."),
+});
+
+export type SavingsContributionInput = z.infer<typeof savingsContributionInputSchema>;
+
 function isFutureMonth(value: string) {
   const [year, month] = value.split("-").map(Number);
   if (!year || !month || month < 1 || month > 12) return false;
   const now = new Date();
   return year > now.getFullYear() || (year === now.getFullYear() && month > now.getMonth() + 1);
+}
+
+function hasAtMostTwoDecimals(value: number) {
+  return Math.abs(value * 100 - Math.round(value * 100)) < Number.EPSILON * 100;
 }

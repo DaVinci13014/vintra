@@ -64,6 +64,7 @@ export async function createAccountExport(userId: string, scope: "profile" | "fu
           savingPlans: { orderBy: { createdAt: "asc" } },
           recommendations: { orderBy: { createdAt: "asc" } },
           savingsSnapshots: { orderBy: { recordedAt: "asc" } },
+          savingsContributions: { orderBy: { createdAt: "asc" } },
           notifications: { orderBy: { createdAt: "asc" } },
           notificationPreference: true,
           pushSubscriptions: {
@@ -182,6 +183,11 @@ export async function createAccountExport(userId: string, scope: "profile" | "fu
       ...snapshot,
       amount: snapshot.amount.toNumber(),
       recordedAt: snapshot.recordedAt.toISOString(),
+    })),
+    savingsContributions: user.profile.savingsContributions.map((contribution) => ({
+      ...contribution,
+      amount: contribution.amount.toNumber(),
+      createdAt: contribution.createdAt.toISOString(),
     })),
     notifications: user.profile.notifications.map((notification) => ({
       ...notification,

@@ -227,6 +227,41 @@ ApiResponse<boolean>
 
 ---
 
+# GOAL ACTIONS
+
+## addSavingsContribution()
+
+Purpose
+
+Ajouter un versement manuel à l'objectif actif.
+
+Input
+
+```ts
+{
+  goalId: string;
+  amount: number;
+}
+```
+
+Output
+
+```ts
+ApiResponse<{
+  completed: boolean;
+  currentAmount: number;
+  progress: number;
+  targetAmount: number;
+  title: string;
+}>
+```
+
+L'action s'exécute dans une transaction sérialisable et met à jour de façon atomique le profil,
+l'objectif, le Saving Plan, l'historique d'épargne, l'historique des versements, les notifications
+et la piste d'audit.
+
+---
+
 # PROFILE ACTIONS
 
 ## getProfile()

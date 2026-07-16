@@ -11,7 +11,7 @@ import {
 import { getSession } from "@/features/auth/server";
 import type { ApiResponse } from "@/shared/api";
 import { prisma } from "@/shared/api/database";
-import { goalInputSchema } from "../model/goal-schema";
+import { goalInputSchema, savingsContributionInputSchema } from "../model/goal-schema";
 
 const idSchema = z.string().uuid();
 
@@ -172,6 +172,124 @@ export async function updateGoal(input: unknown): Promise<ApiResponse<{ id: stri
   }
 }
 
+export async function addSavingsContribution(input: unknown): Promise<
+  ApiResponse<{
+    completed: boolean;
+    currentAmount: number;
+    progress: number;
+    targetAmount: number;
+    title: string;
+  }>
+> {
+  const context = await getContext();
+  if (!context.success) return context;
+  const parsed = savingsContributionInputSchema.safeParse(input);
+  if (!parsed.success) return validationError(parsed.error.issues[0]?.message);
+
+  try {
+    const result = await prisma.$transaction(
+      async (transaction) => {
+        const goal = await transaction.goal.findFirst({
+          where: {
+            id: parsed.data.goalId,
+            status: "ACTIVE",
+            profile: { userId: context.data.userId },
+          },
+          include: {
+            profile: {
+              include: { financialProfiles: { orderBy: { createdAt: "desc" }, take: 1 } },
+            },
+          },
+        });
+        const financial = goal?.profile.financialProfiles[0];
+        if (!goal || !financial) throw new Error("GOAL_NOT_ACTIVE");
+
+        const now = new Date();
+        const currentAmount = money(goal.currentAmount.toNumber() + parsed.data.amount);
+        const currentSavings = money(
+          (goal.profile.currentSavings?.toNumber() ?? 0) + parsed.data.amount,
+        );
+        const plan = calculateGoalPlan(
+          {
+            targetAmount: goal.targetAmount.toNumber(),
+            currentAmount,
+            targetDate: goal.targetDate,
+            savingCapacity: financial.savingCapacity.toNumber(),
+            profileType: financial.profileType,
+          },
+          now,
+        );
+
+        await transaction.profile.update({
+          where: { id: goal.profileId },
+          data: { currentSavings, hasSavings: true },
+        });
+        await transaction.goal.update({
+          where: { id: goal.id },
+          data: { currentAmount, progress: plan.progress, status: plan.status },
+        });
+        await transaction.savingsContribution.create({
+          data: { profileId: goal.profileId, goalId: goal.id, amount: parsed.data.amount },
+        });
+        await transaction.savingsSnapshot.create({
+          data: { profileId: goal.profileId, amount: currentSavings, recordedAt: now },
+        });
+
+        const activePlan = await transaction.savingPlan.findFirst({
+          where: { profileId: goal.profileId, status: "ACTIVE" },
+          orderBy: { createdAt: "desc" },
+        });
+        const planData = {
+          recommendedMonthlySaving: plan.recommendedMonthlySaving,
+          estimatedCompletionDate: plan.estimatedCompletionDate,
+          difficulty: plan.difficulty,
+          progress: plan.progress,
+          status: plan.status,
+          milestones: plan.milestones,
+        };
+        if (activePlan) {
+          await transaction.savingPlan.update({ where: { id: activePlan.id }, data: planData });
+        } else {
+          await transaction.savingPlan.create({ data: { profileId: goal.profileId, ...planData } });
+        }
+
+        await createGoalProgressNotifications(transaction, {
+          profileId: goal.profileId,
+          goalId: goal.id,
+          goalTitle: goal.title,
+          previousProgress: goal.progress.toNumber(),
+          currentProgress: plan.progress,
+          completed: plan.status === "COMPLETED",
+        });
+        await transaction.auditLog.create({
+          data: { userId: context.data.userId, action: "SAVINGS_CONTRIBUTION_ADDED" },
+        });
+
+        return {
+          completed: plan.status === "COMPLETED",
+          currentAmount,
+          progress: plan.progress,
+          targetAmount: goal.targetAmount.toNumber(),
+          title: goal.title,
+        };
+      },
+      { isolationLevel: "Serializable" },
+    );
+    await safelyDeliverPendingPushNotifications(context.data.userId);
+    refresh(parsed.data.goalId);
+    revalidatePath(`/goals/${parsed.data.goalId}/epargne`);
+    return { success: true, data: result };
+  } catch {
+    return {
+      success: false,
+      error: {
+        code: "SAVINGS_CONTRIBUTION_FAILED",
+        message: "Le versement n’a pas pu être ajouté. Réessayez dans un instant.",
+      },
+    };
+  }
+}
+
 export async function archiveGoal(input: unknown): Promise<ApiResponse<{ destination: string }>> {
   return removeGoal(input, "archive");
 }
@@ -237,4 +355,8 @@ function refresh(id?: string) {
   revalidatePath("/dashboard");
   revalidatePath("/goals");
   if (id) revalidatePath(`/goals/${id}`);
+}
+
+function money(value: number) {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
 }

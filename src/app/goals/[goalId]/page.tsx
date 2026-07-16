@@ -29,13 +29,22 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ goa
           )}
         </div>
         {goal.status !== "ARCHIVED" && (
-          <Link
-            href={`/goals/${goal.id}/modifier`}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-sm"
-          >
-            <Pencil size={17} />
-            Modifier
-          </Link>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link
+              href={`/goals/${goal.id}/epargne`}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-foreground px-5 text-sm font-medium text-background transition hover:bg-brand hover:text-brand-foreground"
+            >
+              <PiggyBank size={17} aria-hidden="true" />
+              {goal.status === "COMPLETED" ? "Voir les versements" : "Ajouter de l’épargne"}
+            </Link>
+            <Link
+              href={`/goals/${goal.id}/modifier`}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-sm"
+            >
+              <Pencil size={17} aria-hidden="true" />
+              Modifier
+            </Link>
+          </div>
         )}
       </div>
       <section className="mt-10 rounded-3xl border border-border bg-surface p-5 sm:p-8">

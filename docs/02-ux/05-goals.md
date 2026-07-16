@@ -484,3 +484,34 @@ goal_completed
 ✓ Gestion des états
 
 ✓ Responsive mobile / tablette / desktop
+
+---
+
+# GOAL_006 — Add Savings Contribution
+
+## Purpose
+
+Permettre à l'utilisateur de renseigner chaque somme réellement mise de côté pour son objectif
+principal.
+
+## Entry Points
+
+- Bouton principal dans la carte « Objectif principal » du Dashboard
+- Action principale dans le détail de l'objectif
+
+## Dedicated Page
+
+La page affiche le montant épargné, la cible, la progression, le montant restant, un formulaire de
+versement manuel et l'historique des versements.
+
+## Business Rules
+
+- Un nombre illimité de versements peut être ajouté tant que l'objectif est actif.
+- Chaque versement est strictement positif et comporte au maximum deux décimales.
+- Le montant d'un versement peut dépasser le montant restant.
+- Chaque versement met à jour l'épargne actuelle, l'objectif, le Saving Plan et le Dashboard.
+- Chaque versement ajoute un point à la courbe d'évolution de l'épargne.
+- La courbe est fluide et arrondie, sans segments droits.
+- À 100 %, l'objectif et le Saving Plan passent à l'état `COMPLETED`.
+- Lors du versement qui atteint ou dépasse 100 %, une fenêtre de félicitations est affichée.
+- Après complétion, l'historique reste consultable mais aucun nouveau versement n'est accepté.

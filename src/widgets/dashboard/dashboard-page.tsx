@@ -144,6 +144,13 @@ export function DashboardPage({
                 <span>{Math.round(data.goal.progress)} % atteint</span>
                 <span>Échéance {formatDate(data.goal.targetDate)}</span>
               </div>
+              <Link
+                href={`/goals/${data.goal.id}/epargne`}
+                className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-foreground px-5 text-sm font-medium text-background transition hover:bg-brand hover:text-brand-foreground"
+              >
+                <PiggyBank size={18} aria-hidden="true" />
+                {data.goal.status === "COMPLETED" ? "Voir mes versements" : "Ajouter de l’épargne"}
+              </Link>
             </section>
 
             <section

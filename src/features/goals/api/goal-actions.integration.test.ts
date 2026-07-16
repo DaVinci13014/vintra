@@ -12,7 +12,13 @@ vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
 import { runInitialAnalysis } from "@/features/financial-analysis";
 import { prisma } from "@/shared/api/database";
-import { archiveGoal, createGoal, deleteGoal, updateGoal } from "./goal-actions";
+import {
+  addSavingsContribution,
+  archiveGoal,
+  createGoal,
+  deleteGoal,
+  updateGoal,
+} from "./goal-actions";
 
 describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
   "actions objectifs avec PostgreSQL",
@@ -99,6 +105,55 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
           },
         }),
       ).toBe(1);
+
+      const firstContribution = await addSavingsContribution({
+        goalId: created.data.id,
+        amount: 500,
+      });
+      expect(firstContribution.success).toBe(true);
+      if (!firstContribution.success) return;
+      expect(firstContribution.data.completed).toBe(false);
+      expect(firstContribution.data.currentAmount).toBe(2_500);
+
+      const completionContribution = await addSavingsContribution({
+        goalId: created.data.id,
+        amount: 3_500,
+      });
+      expect(completionContribution.success).toBe(true);
+      if (!completionContribution.success) return;
+      expect(completionContribution.data.completed).toBe(true);
+      expect(completionContribution.data.progress).toBe(100);
+
+      const contributionState = await prisma.profile.findUniqueOrThrow({
+        where: { userId },
+        include: {
+          goals: { where: { id: created.data.id } },
+          savingsContributions: { where: { goalId: created.data.id } },
+          savingsSnapshots: { orderBy: { recordedAt: "asc" } },
+          savingPlans: { where: { status: "COMPLETED" } },
+        },
+      });
+      expect(contributionState.currentSavings?.toNumber()).toBe(6_000);
+      expect(contributionState.goals[0]?.currentAmount.toNumber()).toBe(6_000);
+      expect(contributionState.goals[0]?.status).toBe("COMPLETED");
+      expect(contributionState.savingsContributions.map((item) => item.amount.toNumber())).toEqual([
+        500, 3_500,
+      ]);
+      expect(contributionState.savingsSnapshots.at(-1)?.amount.toNumber()).toBe(6_000);
+      expect(contributionState.savingPlans).toHaveLength(1);
+      expect(
+        await prisma.notification.count({
+          where: { profile: { userId }, dedupeKey: `goal:${created.data.id}:completed` },
+        }),
+      ).toBe(1);
+      expect(
+        await prisma.auditLog.count({
+          where: { userId, action: "SAVINGS_CONTRIBUTION_ADDED" },
+        }),
+      ).toBe(2);
+      expect((await addSavingsContribution({ goalId: created.data.id, amount: 1 })).success).toBe(
+        false,
+      );
 
       expect((await archiveGoal(created.data.id)).success).toBe(true);
       expect(await prisma.goal.count({ where: { profile: { userId }, status: "ACTIVE" } })).toBe(0);

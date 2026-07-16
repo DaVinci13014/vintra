@@ -445,3 +445,16 @@ milestone_reached
 ✓ Les données sont synchronisées avec le Dashboard.
 
 ✓ Le plan reste cohérent après chaque modification du profil.
+
+---
+
+# Manual Contributions
+
+La progression réelle peut être alimentée par des versements manuels depuis l'objectif principal.
+Chaque versement :
+
+- incrémente le montant épargné ;
+- recalcule la progression, le montant restant, les jalons et la date estimée ;
+- alimente l'historique de la courbe d'épargne ;
+- déclenche les notifications de jalon concernées ;
+- termine le plan lorsque la cible est atteinte ou dépassée.

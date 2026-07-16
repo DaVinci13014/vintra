@@ -95,10 +95,12 @@ export function SavingsHistoryChart({
                 }}
               />
               <Area
-                type="monotone"
+                type="bumpX"
                 dataKey="amount"
                 stroke="var(--brand)"
                 strokeWidth={3}
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 fill="var(--brand)"
                 fillOpacity={0.12}
                 activeDot={{

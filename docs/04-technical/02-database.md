@@ -269,6 +269,32 @@ Columns
 
 ---
 
+# Table : savings_contributions
+
+Description
+
+Versements manuels ajoutés par l'utilisateur à un objectif.
+
+| Name | Type | Nullable |
+|-------|------|----------|
+| id | uuid | No |
+| profile_id | uuid | No |
+| goal_id | uuid | No |
+| amount | numeric | No |
+| created_at | timestamptz | No |
+
+Contraintes
+
+- `amount > 0`
+- suppression en cascade avec le profil ou l'objectif
+
+Indexes
+
+- `(profile_id, created_at)`
+- `(goal_id, created_at)`
+
+---
+
 # Table : recommendations
 
 Description
