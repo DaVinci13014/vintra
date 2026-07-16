@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
+import Script from "next/script";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 
-import {
-  LOCALE_COOKIE_NAME,
-  localePreferenceSchema,
-  THEME_COOKIE_NAME,
-  themePreferenceSchema,
-} from "@/shared/config";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,20 +14,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const cookieStore = await cookies();
-  const parsedTheme = themePreferenceSchema.safeParse(cookieStore.get(THEME_COOKIE_NAME)?.value);
-  const parsedLocale = localePreferenceSchema.safeParse(cookieStore.get(LOCALE_COOKIE_NAME)?.value);
-  const theme = parsedTheme.success ? parsedTheme.data : "SYSTEM";
-  const locale = parsedLocale.success ? parsedLocale.data : "FR";
-
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang={locale.toLowerCase()}
-      data-theme={theme.toLowerCase()}
+      lang="fr"
+      data-theme="system"
       className={`${GeistSans.variable} ${GeistMono.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
+      </head>
       <body>{children}</body>
     </html>
   );
