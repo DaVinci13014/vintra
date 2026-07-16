@@ -1,8 +1,17 @@
 "use client";
 
 import { Button } from "@/shared/ui";
+import { useReportError } from "@/shared/lib/monitoring/client";
 
-export default function SettingsError({ reset }: { reset: () => void }) {
+export default function SettingsError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useReportError(error);
+
   return (
     <main className="grid min-h-svh place-items-center bg-background px-4">
       <div className="max-w-md rounded-3xl border border-border bg-surface p-8 text-center">

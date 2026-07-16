@@ -4,9 +4,13 @@
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.13.1",
+  "engines": {
+    "node": ">=24 <25"
+  },
   "scripts": {
     "dev": "next dev --turbopack --hostname 127.0.0.1 --port 13015",
     "build": "next build",
+    "build:deploy": "pnpm db:deploy && next build",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
@@ -14,8 +18,13 @@
     "test": "vitest run",
     "test:integration": "RUN_DATABASE_TESTS=true vitest run",
     "typecheck": "tsc --noEmit",
+    "quality": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "quality:ci": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:integration && pnpm build",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:status": "prisma migrate status",
+    "db:validate": "prisma validate",
     "db:studio": "prisma studio",
     "postinstall": "prisma generate"
   },
@@ -26,18 +35,23 @@
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@radix-ui/react-slot": "^1.2.3",
+    "@sentry/nextjs": "^10.66.0",
     "better-auth": "^1.6.23",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.24",
     "geist": "^1.5.1",
+    "import-in-the-middle": "3.3.1",
     "lucide-react": "^0.468.0",
     "next": "^15.5.7",
     "pg": "^8.22.0",
+    "pino": "^10.3.1",
+    "posthog-js": "^1.402.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.66.0",
     "recharts": "^3.9.2",
+    "require-in-the-middle": "8.0.1",
     "resend": "^6.17.2",
     "tailwind-merge": "^3.3.1",
     "web-push": "^3.6.7",
@@ -45,15 +59,22 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@next/eslint-plugin-next": "15.5.20",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^24.10.1",
     "@types/pg": "^8.20.0",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@types/web-push": "^3.6.4",
+    "@typescript-eslint/eslint-plugin": "8.46.4",
+    "@typescript-eslint/parser": "8.46.4",
     "dotenv": "^17.4.2",
     "eslint": "^9.39.1",
     "eslint-config-next": "^15.5.7",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "5.2.0",
     "prettier": "^3.6.2",
     "prisma": "^7.8.0",
     "tailwindcss": "^4.1.17",
@@ -61,6 +82,12 @@
     "vitest": "^4.1.10"
   },
   "pnpm": {
+    "ignoredBuiltDependencies": [
+      "core-js"
+    ],
+    "onlyBuiltDependencies": [
+      "@sentry/cli"
+    ],
     "overrides": {
       "@hono/node-server": "1.19.13"
     }

@@ -1,0 +1,100 @@
+name: Sauvegarde chiffrée de production
+
+on:
+  schedule:
+    - cron: "30 2 * * 0"
+  workflow_dispatch:
+
+concurrency:
+  cancel-in-progress: false
+  group: production-database-backup
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    name: Sauvegarder et tester la restauration
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
+      PRODUCTION_DIRECT_URL: ${{ secrets.PRODUCTION_DIRECT_URL }}
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Vérifier la présence des secrets
+        run: |
+          set -euo pipefail
+          test -n "${PRODUCTION_DIRECT_URL}"
+          test -n "${BACKUP_ENCRYPTION_KEY}"
+
+      - name: Créer la sauvegarde PostgreSQL
+        id: dump
+        run: |
+          set -euo pipefail
+          backup_name="vintra-$(date -u +%Y%m%dT%H%M%SZ).dump"
+          mkdir -p backups
+          docker run --rm \
+            --env BACKUP_NAME="${backup_name}" \
+            --env PGURL="${PRODUCTION_DIRECT_URL}" \
+            --volume "${PWD}/backups:/backups" \
+            postgres:17-alpine \
+            sh -eu -c 'pg_dump "$PGURL" --format=custom --no-acl --no-owner --schema=public --file="/backups/$BACKUP_NAME"'
+          test -s "backups/${backup_name}"
+          echo "backup_name=${backup_name}" >> "${GITHUB_OUTPUT}"
+
+      - name: Restaurer dans un PostgreSQL temporaire
+        env:
+          BACKUP_NAME: ${{ steps.dump.outputs.backup_name }}
+        run: |
+          set -euo pipefail
+          docker run --detach --name vintra-restore \
+            --env POSTGRES_DB=vintra_restore \
+            --env POSTGRES_PASSWORD=restore-only-password \
+            --env POSTGRES_USER=postgres \
+            postgres:17-alpine
+          trap 'docker rm --force vintra-restore >/dev/null 2>&1 || true' EXIT
+          for attempt in $(seq 1 30); do
+            if docker exec vintra-restore pg_isready --dbname vintra_restore --username postgres; then
+              break
+            fi
+            if [ "${attempt}" -eq 30 ]; then
+              exit 1
+            fi
+            sleep 1
+          done
+          docker run --rm \
+            --network container:vintra-restore \
+            --env BACKUP_NAME="${BACKUP_NAME}" \
+            --env PGPASSWORD=restore-only-password \
+            --volume "${PWD}/backups:/backups:ro" \
+            postgres:17-alpine \
+            sh -eu -c 'pg_restore --host=127.0.0.1 --username=postgres --dbname=vintra_restore --exit-on-error --no-acl --no-owner "/backups/$BACKUP_NAME"'
+          migration_count=$(docker exec \
+            --env PGPASSWORD=restore-only-password \
+            vintra-restore \
+            psql --host=127.0.0.1 --username=postgres --dbname=vintra_restore \
+            --no-align --tuples-only --command 'SELECT COUNT(*) FROM "_prisma_migrations";')
+          test "${migration_count}" -gt 0
+
+      - name: Chiffrer la sauvegarde validée
+        env:
+          BACKUP_NAME: ${{ steps.dump.outputs.backup_name }}
+        run: |
+          set -euo pipefail
+          openssl enc -aes-256-cbc -pbkdf2 -salt \
+            -in "backups/${BACKUP_NAME}" \
+            -out "backups/${BACKUP_NAME}.enc" \
+            -pass env:BACKUP_ENCRYPTION_KEY
+          rm -f "backups/${BACKUP_NAME}"
+          test -s "backups/${BACKUP_NAME}.enc"
+
+      - name: Conserver la sauvegarde chiffrée
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: error
+          name: ${{ steps.dump.outputs.backup_name }}.enc
+          path: backups/${{ steps.dump.outputs.backup_name }}.enc
+          retention-days: 14

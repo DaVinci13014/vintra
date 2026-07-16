@@ -189,20 +189,16 @@ export async function ensureWeeklySummary(userId: string, now = new Date()) {
 
   const goal = profile.goals[0];
   const recommendation = profile.recommendations[0];
-  const details = [
-    goal ? `« ${goal.title} » est à ${Math.round(goal.progress.toNumber())} %.` : null,
-    `Épargne actuelle : ${new Intl.NumberFormat("fr-FR", {
-      style: "currency",
-      currency: profile.currency,
-      maximumFractionDigits: 0,
-    }).format(profile.currentSavings?.toNumber() ?? 0)}.`,
-    recommendation ? `Priorité : ${recommendation.title}.` : null,
-  ].filter((detail): detail is string => Boolean(detail));
 
   const notificationId = await createNotification(prisma, {
     profileId: profile.id,
     title: "Votre résumé de la semaine",
-    description: details.join(" "),
+    description: buildWeeklySummaryDescription({
+      currency: profile.currency,
+      currentSavings: profile.currentSavings?.toNumber() ?? 0,
+      goal: goal ? { progress: goal.progress.toNumber(), title: goal.title } : undefined,
+      recommendationTitle: recommendation?.title,
+    }),
     type: "SYSTEM",
     priority: "LOW",
     actionUrl: "/dashboard",
@@ -210,6 +206,66 @@ export async function ensureWeeklySummary(userId: string, now = new Date()) {
   });
   await safelyDeliverPendingPushNotifications(userId);
   return notificationId;
+}
+
+export async function generateWeeklySummaries(now = new Date()) {
+  const profiles = await prisma.profile.findMany({
+    where: { onboardingCompleted: true },
+    orderBy: { id: "asc" },
+    select: {
+      id: true,
+      userId: true,
+      currency: true,
+      currentSavings: true,
+      goals: {
+        where: { status: { in: ["ACTIVE", "COMPLETED"] } },
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: { title: true, progress: true },
+      },
+      recommendations: {
+        where: { status: { in: ["GENERATED", "DISPLAYED", "OPENED"] } },
+        orderBy: [{ priority: "desc" }, { createdAt: "desc" }],
+        take: 1,
+        select: { title: true },
+      },
+    },
+  });
+
+  const dedupeKey = `weekly-summary:${getIsoWeekKey(now)}`;
+  if (profiles.length === 0) {
+    return { created: 0, profiles: 0, pushDelivered: 0 };
+  }
+
+  const created = await prisma.notification.createMany({
+    data: profiles.map((profile) => {
+      const goal = profile.goals[0];
+      return {
+        actionUrl: "/dashboard",
+        dedupeKey,
+        description: buildWeeklySummaryDescription({
+          currency: profile.currency,
+          currentSavings: profile.currentSavings?.toNumber() ?? 0,
+          goal: goal ? { progress: goal.progress.toNumber(), title: goal.title } : undefined,
+          recommendationTitle: profile.recommendations[0]?.title,
+        }),
+        priority: "LOW" as const,
+        profileId: profile.id,
+        title: "Votre résumé de la semaine",
+        type: "SYSTEM" as const,
+      };
+    }),
+    skipDuplicates: true,
+  });
+
+  let pushDelivered = 0;
+  for (const profile of profiles) {
+    await archiveOverflow(prisma, profile.id);
+    const delivery = await safelyDeliverPendingPushNotifications(profile.userId);
+    pushDelivered += delivery.delivered;
+  }
+
+  return { created: created.count, profiles: profiles.length, pushDelivered };
 }
 
 export async function deliverPendingPushNotifications(userId: string) {
@@ -333,4 +389,23 @@ function getIsoWeekKey(date: Date) {
   const yearStart = new Date(Date.UTC(utcDate.getUTCFullYear(), 0, 1));
   const week = Math.ceil(((utcDate.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
   return `${utcDate.getUTCFullYear()}-${String(week).padStart(2, "0")}`;
+}
+
+function buildWeeklySummaryDescription(input: {
+  currency: string;
+  currentSavings: number;
+  goal?: { progress: number; title: string };
+  recommendationTitle?: string;
+}) {
+  const details = [
+    input.goal ? `« ${input.goal.title} » est à ${Math.round(input.goal.progress)} %.` : null,
+    `Épargne actuelle : ${new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: input.currency,
+      maximumFractionDigits: 0,
+    }).format(input.currentSavings)}.`,
+    input.recommendationTitle ? `Priorité : ${input.recommendationTitle}.` : null,
+  ].filter((detail): detail is string => Boolean(detail));
+
+  return details.join(" ");
 }

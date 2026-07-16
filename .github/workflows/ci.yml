@@ -1,0 +1,65 @@
+name: Qualité Vintra
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  cancel-in-progress: true
+  group: quality-${{ github.ref }}
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Vérifications complètes
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: vintra_ci
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d vintra_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      APP_VERSION: 0.1.0
+      BETTER_AUTH_SECRET: vintra-ci-secret-with-more-than-32-characters
+      BETTER_AUTH_URL: http://localhost:13015
+      CRON_SECRET: vintra-ci-cron-secret
+      DATABASE_POOL_MAX: 5
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/vintra_ci
+      DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/vintra_ci
+      LOG_LEVEL: silent
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: pnpm
+          node-version-file: .nvmrc
+
+      - name: Installer les dépendances verrouillées
+        run: pnpm install --frozen-lockfile
+
+      - name: Appliquer les migrations de test
+        run: pnpm db:deploy
+
+      - name: Vérifier intégralement Vintra
+        run: pnpm quality:ci

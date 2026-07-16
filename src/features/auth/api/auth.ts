@@ -6,16 +6,17 @@ import { nextCookies } from "better-auth/next-js";
 import { prisma } from "@/shared/api/database";
 import { createSecurityNotificationForUser } from "@/entities/notification/server";
 import { sendAuthEmail } from "@/shared/api/email";
-import { serverEnv } from "@/shared/config/server";
+import { getApplicationUrl, serverEnv } from "@/shared/config/server";
 import { hashPassword, verifyPassword } from "../lib/password";
 
 const hasEmailProvider = Boolean(serverEnv.RESEND_API_KEY && serverEnv.EMAIL_FROM);
+const applicationUrl = getApplicationUrl();
 
 export const auth = betterAuth({
   appName: "Vintra",
-  baseURL: serverEnv.BETTER_AUTH_URL,
+  baseURL: applicationUrl,
   secret: serverEnv.BETTER_AUTH_SECRET,
-  trustedOrigins: [serverEnv.BETTER_AUTH_URL],
+  trustedOrigins: [...new Set([applicationUrl, serverEnv.BETTER_AUTH_URL])],
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   hooks: {
     before: createAuthMiddleware(async (context) => {
@@ -160,6 +161,7 @@ export const auth = betterAuth({
   },
   rateLimit: {
     enabled: true,
+    storage: "database",
     window: 60,
     max: 100,
     customRules: {

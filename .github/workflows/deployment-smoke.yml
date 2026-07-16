@@ -1,0 +1,42 @@
+name: Validation du déploiement
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    if: github.event.deployment_status.state == 'success'
+    name: Contrôles publics
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      DEPLOYMENT_URL: ${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}
+    steps:
+      - name: Vérifier la configuration de l’événement
+        run: test -n "${DEPLOYMENT_URL}"
+
+      - name: Vérifier la page publique et ses protections
+        run: |
+          set -euo pipefail
+          headers=$(curl --fail --silent --show-error --head "${DEPLOYMENT_URL}/")
+          grep -qi '^content-security-policy:' <<< "${headers}"
+          grep -qi '^strict-transport-security:' <<< "${headers}"
+          grep -qi '^x-content-type-options: nosniff' <<< "${headers}"
+
+      - name: Vérifier la disponibilité et PostgreSQL
+        run: |
+          set -euo pipefail
+          payload=$(curl --fail --silent --show-error "${DEPLOYMENT_URL}/api/health")
+          node --input-type=module --eval '
+            const payload = JSON.parse(process.argv[1]);
+            if (payload.status !== "ok" || payload.checks?.database !== "ok") process.exit(1);
+          ' "${payload}"
+
+      - name: Vérifier la protection de la tâche planifiée
+        run: |
+          set -euo pipefail
+          status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "${DEPLOYMENT_URL}/api/cron/weekly-summary")
+          test "${status}" = "401"

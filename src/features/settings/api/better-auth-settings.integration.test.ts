@@ -1,7 +1,7 @@
 import "dotenv/config";
 
 import { randomUUID } from "node:crypto";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { auth } from "@/features/auth/server";
 import { prisma } from "@/shared/api/database";
@@ -15,8 +15,13 @@ const newPassword = "Nouveau2!";
 describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
   "paramètres avec Better Auth réel",
   () => {
+    beforeAll(async () => {
+      await prisma.rateLimit.deleteMany();
+    });
+
     afterAll(async () => {
       await prisma.user.deleteMany({ where: { email } });
+      await prisma.rateLimit.deleteMany();
       await prisma.$disconnect();
     });
 
@@ -109,6 +114,30 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
         }),
       ).toBe(1);
     });
+
+    it("conserve la limitation anti-abus dans PostgreSQL", async () => {
+      const clientIp = `2001:db8:${suffix.slice(0, 4)}::1`;
+      for (let attempt = 0; attempt < 5; attempt += 1) {
+        const response = await callAuth(
+          "/sign-in/email",
+          { email: `unknown-${suffix}@vintra.test`, password: "Invalid1!" },
+          undefined,
+          "POST",
+          clientIp,
+        );
+        expect(response.status).not.toBe(429);
+      }
+
+      const blockedResponse = await callAuth(
+        "/sign-in/email",
+        { email: `unknown-${suffix}@vintra.test`, password: "Invalid1!" },
+        undefined,
+        "POST",
+        clientIp,
+      );
+      expect(blockedResponse.status).toBe(429);
+      expect(await prisma.rateLimit.count()).toBeGreaterThan(0);
+    });
   },
 );
 
@@ -117,10 +146,12 @@ async function callAuth(
   body?: Record<string, unknown>,
   cookie?: string,
   method = "POST",
+  clientIp?: string,
 ) {
   const headers = new Headers({ Origin: serverEnv.BETTER_AUTH_URL });
   if (body) headers.set("Content-Type", "application/json");
   if (cookie) headers.set("Cookie", cookie);
+  if (clientIp) headers.set("X-Forwarded-For", clientIp);
 
   return auth.handler(
     new Request(`${serverEnv.BETTER_AUTH_URL}/api/auth${path}`, {

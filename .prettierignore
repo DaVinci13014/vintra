@@ -1,6 +1,7 @@
 .next/
 .next-dev/
 node_modules/
+.pnpm-store/
 docs/
 src/shared/api/generated/
 pnpm-lock.yaml

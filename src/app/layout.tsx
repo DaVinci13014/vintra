@@ -3,9 +3,14 @@ import Script from "next/script";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 
+import { getApplicationUrl } from "@/shared/config/server";
 import "./globals.css";
 
+const applicationUrl = getApplicationUrl();
+
 export const metadata: Metadata = {
+  metadataBase: new URL(applicationUrl),
+  applicationName: "Vintra",
   title: { default: "Vintra - Conseiller financier", template: "%s · Vintra" },
   description: "Comprenez vos finances et construisez une épargne à votre rythme.",
   icons: {

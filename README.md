@@ -21,9 +21,9 @@ d’email est désactivée.
 ## Qualité
 
 ```bash
-pnpm lint
-pnpm typecheck
-pnpm build
+pnpm quality
 ```
+
+La mise en ligne automatisée, Supabase, Vercel, la surveillance et les sauvegardes sont détaillées dans [le guide de production](docs/06-engineering/07-production-runbook.md).
 
 La documentation produit et technique est indexée dans `docs/00-README.md`.

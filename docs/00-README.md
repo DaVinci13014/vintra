@@ -11,6 +11,8 @@ Les 36 notes fournies ont été classées en ordre croissant et normalisées san
 - `05-design` — système visuel, tokens, layout, composants, motion, graphiques, iconographie, marque et rédaction.
 - `06-engineering` — stack, développement, architecture FSD, règles IA, dépendances et déploiement.
 
+Le guide opérationnel de publication se trouve dans `06-engineering/07-production-runbook.md`.
+
 ## Corrections de classement
 
 - `Product-principales` a été normalisé en `product-principles`.

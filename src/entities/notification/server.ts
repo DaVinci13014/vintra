@@ -6,6 +6,7 @@ export {
   createSecurityNotificationForUser,
   deliverPendingPushNotifications,
   ensureWeeklySummary,
+  generateWeeklySummaries,
   getWebPushPublicKey,
   isWebPushConfigured,
   safelyDeliverPendingPushNotifications,
