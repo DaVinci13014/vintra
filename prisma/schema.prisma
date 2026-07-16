@@ -75,49 +75,52 @@ model Verification {
 }
 
 model Profile {
-  id                    String                @id @default(uuid()) @db.Uuid
-  userId                String                @unique @db.Uuid
-  birthDate             DateTime?             @db.Date
-  country               String?
-  currency              String                @default("EUR")
-  locale                LocalePreference      @default(FR)
-  theme                 ThemePreference       @default(SYSTEM)
-  profession            Profession?
-  incomeType            IncomeType?
-  incomeFrequency       IncomeFrequency?
-  monthlyIncome         Decimal?              @db.Decimal(14, 2)
-  hasAdditionalIncome   Boolean?
-  additionalIncome      Decimal?              @db.Decimal(14, 2)
-  housingExpense        Decimal?              @db.Decimal(14, 2)
-  foodExpense           Decimal?              @db.Decimal(14, 2)
-  transportExpense      Decimal?              @db.Decimal(14, 2)
-  restaurantExpense     Decimal?              @db.Decimal(14, 2)
-  shoppingExpense       Decimal?              @db.Decimal(14, 2)
-  hobbyExpense          Decimal?              @db.Decimal(14, 2)
-  subscriptionExpense   Decimal?              @db.Decimal(14, 2)
-  impulsePurchase       Frequency?
-  bankCheckFrequency    BankCheckFrequency?
-  hasBudget             Boolean?
-  budgetCompliance      Frequency?
-  installmentUsage      InstallmentFrequency?
-  endOfMonthDifficulty  EndOfMonthFrequency?
-  hasSavings            Boolean?
-  currentSavings        Decimal?              @db.Decimal(14, 2)
-  monthlySavings        Decimal?              @db.Decimal(14, 2)
-  goalReason            String?
-  goalTargetAmount      Decimal?              @db.Decimal(14, 2)
-  goalTargetDate        DateTime?             @db.Date
-  goalPriority          Int?
-  currentOnboardingStep Int                   @default(1)
-  onboardingCompleted   Boolean               @default(false)
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
-  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  financialProfiles     FinancialProfile[]
-  goals                 Goal[]
-  savingPlans           SavingPlan[]
-  recommendations       Recommendation[]
-  savingsSnapshots      SavingsSnapshot[]
+  id                     String                  @id @default(uuid()) @db.Uuid
+  userId                 String                  @unique @db.Uuid
+  birthDate              DateTime?               @db.Date
+  country                String?
+  currency               String                  @default("EUR")
+  locale                 LocalePreference        @default(FR)
+  theme                  ThemePreference         @default(SYSTEM)
+  profession             Profession?
+  incomeType             IncomeType?
+  incomeFrequency        IncomeFrequency?
+  monthlyIncome          Decimal?                @db.Decimal(14, 2)
+  hasAdditionalIncome    Boolean?
+  additionalIncome       Decimal?                @db.Decimal(14, 2)
+  housingExpense         Decimal?                @db.Decimal(14, 2)
+  foodExpense            Decimal?                @db.Decimal(14, 2)
+  transportExpense       Decimal?                @db.Decimal(14, 2)
+  restaurantExpense      Decimal?                @db.Decimal(14, 2)
+  shoppingExpense        Decimal?                @db.Decimal(14, 2)
+  hobbyExpense           Decimal?                @db.Decimal(14, 2)
+  subscriptionExpense    Decimal?                @db.Decimal(14, 2)
+  impulsePurchase        Frequency?
+  bankCheckFrequency     BankCheckFrequency?
+  hasBudget              Boolean?
+  budgetCompliance       Frequency?
+  installmentUsage       InstallmentFrequency?
+  endOfMonthDifficulty   EndOfMonthFrequency?
+  hasSavings             Boolean?
+  currentSavings         Decimal?                @db.Decimal(14, 2)
+  monthlySavings         Decimal?                @db.Decimal(14, 2)
+  goalReason             String?
+  goalTargetAmount       Decimal?                @db.Decimal(14, 2)
+  goalTargetDate         DateTime?               @db.Date
+  goalPriority           Int?
+  currentOnboardingStep  Int                     @default(1)
+  onboardingCompleted    Boolean                 @default(false)
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  user                   User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  financialProfiles      FinancialProfile[]
+  goals                  Goal[]
+  savingPlans            SavingPlan[]
+  recommendations        Recommendation[]
+  savingsSnapshots       SavingsSnapshot[]
+  notifications          Notification[]
+  notificationPreference NotificationPreference?
+  pushSubscriptions      PushSubscription[]
 
   @@index([country])
   @@index([profession])
@@ -233,6 +236,58 @@ model Recommendation {
   @@map("recommendations")
 }
 
+model Notification {
+  id          String               @id @default(uuid()) @db.Uuid
+  profileId   String               @db.Uuid
+  title       String
+  description String
+  type        NotificationType
+  priority    NotificationPriority
+  status      NotificationStatus   @default(UNREAD)
+  actionUrl   String?              @db.VarChar(500)
+  dedupeKey   String?              @db.VarChar(255)
+  readAt      DateTime?
+  archivedAt  DateTime?
+  pushSentAt  DateTime?
+  createdAt   DateTime             @default(now())
+  profile     Profile              @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, dedupeKey])
+  @@index([profileId, status, createdAt])
+  @@index([profileId, type, createdAt])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id                  String   @id @default(uuid()) @db.Uuid
+  profileId           String   @unique @db.Uuid
+  goalProgressPush    Boolean  @default(true)
+  recommendationsPush Boolean  @default(true)
+  weeklySummaryPush   Boolean  @default(true)
+  pushEnabled         Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  profile             Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+model PushSubscription {
+  id             String    @id @default(uuid()) @db.Uuid
+  profileId      String    @db.Uuid
+  endpoint       String    @unique @db.VarChar(2048)
+  p256dh         String    @db.VarChar(255)
+  auth           String    @db.VarChar(255)
+  expirationTime DateTime?
+  userAgent      String?   @db.VarChar(500)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  profile        Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@map("push_subscriptions")
+}
+
 enum Profession {
   EMPLOYEE
   FREELANCER
@@ -267,6 +322,11 @@ enum AuditAction {
   SUPPORT_REQUESTED
   SIGNED_OUT
   ACCOUNT_DELETED
+  NOTIFICATION_OPENED
+  NOTIFICATION_CLICKED
+  NOTIFICATION_DELETED
+  NOTIFICATION_READ
+  NOTIFICATION_SETTINGS_UPDATED
 }
 
 enum IncomeType {
@@ -379,5 +439,25 @@ enum RecommendationStatus {
   DISPLAYED
   OPENED
   APPLIED
+  ARCHIVED
+}
+
+enum NotificationType {
+  GOAL
+  SAVINGS
+  RECOMMENDATION
+  SYSTEM
+  SECURITY
+}
+
+enum NotificationPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
   ARCHIVED
 }

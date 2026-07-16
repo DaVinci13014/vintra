@@ -2,6 +2,11 @@ import { z } from "zod";
 
 import { calculateFinancialAnalysis, type AnalysisInput } from "@/entities/financial-profile";
 import { generateRecommendations } from "@/entities/recommendation";
+import {
+  createGoalProgressNotifications,
+  createRecommendationNotification,
+  safelyDeliverPendingPushNotifications,
+} from "@/entities/notification/server";
 import { prisma } from "@/shared/api/database";
 
 const analysisProfileSchema = z.object({
@@ -47,7 +52,7 @@ const GOAL_TITLES = {
 } as const;
 
 export async function runInitialAnalysis(userId: string) {
-  return prisma.$transaction(async (transaction) => {
+  const result = await prisma.$transaction(async (transaction) => {
     const profile = await transaction.profile.findUnique({ where: { userId } });
     if (!profile) throw new Error("PROFILE_NOT_FOUND");
 
@@ -175,6 +180,23 @@ export async function runInitialAnalysis(userId: string) {
           ...recommendation,
         })),
       });
+      await createRecommendationNotification(transaction, {
+        profileId: profile.id,
+        sourceId: financialProfile.id,
+        count: recommendations.length,
+      });
+    }
+
+    if (goalStatus === "COMPLETED") {
+      await createGoalProgressNotifications(transaction, {
+        profileId: profile.id,
+        goalId: goal.id,
+        goalTitle: goal.title,
+        previousProgress: 0,
+        currentProgress: analysis.goalProgress,
+        completed: true,
+        includeMilestones: false,
+      });
     }
 
     await transaction.profile.update({
@@ -184,4 +206,6 @@ export async function runInitialAnalysis(userId: string) {
 
     return { analysisId: financialProfile.id, goalId: goal.id, alreadyCompleted: false };
   });
+  if (!result.alreadyCompleted) await safelyDeliverPendingPushNotifications(userId);
+  return result;
 }

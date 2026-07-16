@@ -64,6 +64,17 @@ export async function createAccountExport(userId: string, scope: "profile" | "fu
           savingPlans: { orderBy: { createdAt: "asc" } },
           recommendations: { orderBy: { createdAt: "asc" } },
           savingsSnapshots: { orderBy: { recordedAt: "asc" } },
+          notifications: { orderBy: { createdAt: "asc" } },
+          notificationPreference: true,
+          pushSubscriptions: {
+            orderBy: { createdAt: "asc" },
+            select: {
+              expirationTime: true,
+              userAgent: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
         },
       },
       supportRequests: {
@@ -171,6 +182,26 @@ export async function createAccountExport(userId: string, scope: "profile" | "fu
       ...snapshot,
       amount: snapshot.amount.toNumber(),
       recordedAt: snapshot.recordedAt.toISOString(),
+    })),
+    notifications: user.profile.notifications.map((notification) => ({
+      ...notification,
+      readAt: notification.readAt?.toISOString() ?? null,
+      archivedAt: notification.archivedAt?.toISOString() ?? null,
+      pushSentAt: notification.pushSentAt?.toISOString() ?? null,
+      createdAt: notification.createdAt.toISOString(),
+    })),
+    notificationPreferences: user.profile.notificationPreference
+      ? {
+          ...user.profile.notificationPreference,
+          createdAt: user.profile.notificationPreference.createdAt.toISOString(),
+          updatedAt: user.profile.notificationPreference.updatedAt.toISOString(),
+        }
+      : null,
+    pushDevices: user.profile.pushSubscriptions.map((subscription) => ({
+      ...subscription,
+      expirationTime: subscription.expirationTime?.toISOString() ?? null,
+      createdAt: subscription.createdAt.toISOString(),
+      updatedAt: subscription.updatedAt.toISOString(),
     })),
     supportRequests: user.supportRequests.map((request) => ({
       ...request,

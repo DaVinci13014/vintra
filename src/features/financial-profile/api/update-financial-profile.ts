@@ -5,6 +5,12 @@ import { revalidatePath } from "next/cache";
 import { calculateFinancialAnalysis, type AnalysisInput } from "@/entities/financial-profile";
 import { calculateGoalPlan } from "@/entities/goal";
 import { generateRecommendations } from "@/entities/recommendation";
+import {
+  createGoalProgressNotifications,
+  createProfileUpdatedNotification,
+  createRecommendationNotification,
+  safelyDeliverPendingPushNotifications,
+} from "@/entities/notification/server";
 import { getSession } from "@/features/auth/server";
 import type { ApiResponse } from "@/shared/api";
 import { prisma } from "@/shared/api/database";
@@ -22,10 +28,10 @@ export async function updateFinancialProfile(
     return failure("VALIDATION_ERROR", parsed.error.issues[0]?.message ?? "Vérifiez les montants.");
 
   try {
-    await prisma.$transaction(async (transaction) => {
+    const updated = await prisma.$transaction(async (transaction) => {
       const previous = await transaction.profile.findUnique({ where: { userId: session.user.id } });
       if (!previous?.onboardingCompleted) throw new Error("PROFILE_INCOMPLETE");
-      if (!hasFinancialChanges(previous, parsed.data)) return;
+      if (!hasFinancialChanges(previous, parsed.data)) return false;
       const profile = await transaction.profile.update({
         where: { id: previous.id },
         data: {
@@ -57,7 +63,7 @@ export async function updateFinancialProfile(
       const now = new Date();
       const analysis = calculateFinancialAnalysis(analysisInput, now);
       const recommendations = generateRecommendations({ input: analysisInput, analysis });
-      await transaction.financialProfile.create({
+      const financialProfile = await transaction.financialProfile.create({
         data: {
           profileId: profile.id,
           profileType: analysis.profileType,
@@ -87,6 +93,15 @@ export async function updateFinancialProfile(
             ...recommendation,
           })),
         });
+      await createProfileUpdatedNotification(transaction, {
+        profileId: profile.id,
+        sourceId: financialProfile.id,
+      });
+      await createRecommendationNotification(transaction, {
+        profileId: profile.id,
+        sourceId: financialProfile.id,
+        count: recommendations.length,
+      });
       if (goal) {
         const plan = calculateGoalPlan(
           {
@@ -121,11 +136,21 @@ export async function updateFinancialProfile(
         if (activePlan)
           await transaction.savingPlan.update({ where: { id: activePlan.id }, data: planData });
         else await transaction.savingPlan.create({ data: { profileId: profile.id, ...planData } });
+        await createGoalProgressNotifications(transaction, {
+          profileId: profile.id,
+          goalId: goal.id,
+          goalTitle: goal.title,
+          previousProgress: goal.progress.toNumber(),
+          currentProgress: plan.progress,
+          completed: plan.status === "COMPLETED",
+        });
       }
       await transaction.auditLog.create({
         data: { userId: session.user.id, action: "PROFILE_UPDATED" },
       });
+      return true;
     });
+    if (updated) await safelyDeliverPendingPushNotifications(session.user.id);
     revalidatePath("/dashboard");
     revalidatePath("/profile");
     revalidatePath("/settings/profile/finances");

@@ -4,6 +4,10 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { calculateGoalPlan } from "@/entities/goal";
+import {
+  createGoalProgressNotifications,
+  safelyDeliverPendingPushNotifications,
+} from "@/entities/notification/server";
 import { getSession } from "@/features/auth/server";
 import type { ApiResponse } from "@/shared/api";
 import { prisma } from "@/shared/api/database";
@@ -62,8 +66,20 @@ export async function createGoal(input: unknown): Promise<ApiResponse<{ id: stri
           milestones: plan.milestones,
         },
       });
+      if (plan.status === "COMPLETED") {
+        await createGoalProgressNotifications(transaction, {
+          profileId: profile.id,
+          goalId: created.id,
+          goalTitle: created.title,
+          previousProgress: 0,
+          currentProgress: plan.progress,
+          completed: true,
+          includeMilestones: false,
+        });
+      }
       return created;
     });
+    await safelyDeliverPendingPushNotifications(context.data.userId);
     refresh();
     return { success: true, data: { id: goal.id } };
   } catch {
@@ -136,7 +152,16 @@ export async function updateGoal(input: unknown): Promise<ApiResponse<{ id: stri
         await transaction.savingPlan.update({ where: { id: activePlan.id }, data: planData });
       else
         await transaction.savingPlan.create({ data: { profileId: goal.profileId, ...planData } });
+      await createGoalProgressNotifications(transaction, {
+        profileId: goal.profileId,
+        goalId: goal.id,
+        goalTitle: parsed.data.title,
+        previousProgress: goal.progress.toNumber(),
+        currentProgress: plan.progress,
+        completed: plan.status === "COMPLETED",
+      });
     });
+    await safelyDeliverPendingPushNotifications(context.data.userId);
     refresh(parsed.data.id);
     return { success: true, data: { id: parsed.data.id } };
   } catch {

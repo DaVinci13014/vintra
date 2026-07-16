@@ -1,5 +1,6 @@
 import {
   ArrowLeft,
+  BellRing,
   CircleHelp,
   LockKeyhole,
   Palette,
@@ -15,6 +16,12 @@ import { Logo } from "@/shared/ui";
 const NAVIGATION = [
   { id: "profile", href: "/settings/profile", label: "Mon profil", icon: UserRound },
   { id: "preferences", href: "/settings/preferences", label: "Préférences", icon: Palette },
+  {
+    id: "notifications",
+    href: "/settings/notifications",
+    label: "Notifications",
+    icon: BellRing,
+  },
   { id: "security", href: "/settings/security", label: "Sécurité", icon: LockKeyhole },
   { id: "privacy", href: "/settings/privacy", label: "Confidentialité", icon: ShieldCheck },
   { id: "support", href: "/settings/support", label: "Support", icon: CircleHelp },

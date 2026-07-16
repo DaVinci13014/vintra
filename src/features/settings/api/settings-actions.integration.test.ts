@@ -132,6 +132,11 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")("paramètres avec Post
     expect(user.auditLogs.map((log) => log.action)).toEqual(
       expect.arrayContaining(["PROFILE_UPDATED", "PREFERENCES_UPDATED", "AVATAR_UPDATED"]),
     );
+    expect(
+      await prisma.notification.count({
+        where: { profile: { userId }, title: "Situation professionnelle mise à jour" },
+      }),
+    ).toBe(1);
   });
 
   it("enregistre une demande de support validée", async () => {
@@ -144,6 +149,21 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")("paramètres avec Post
   });
 
   it("exporte les données sans mot de passe ni jeton de session", async () => {
+    const exportProfile = await prisma.profile.findUniqueOrThrow({ where: { userId } });
+    await prisma.notificationPreference.upsert({
+      where: { profileId: exportProfile.id },
+      create: { profileId: exportProfile.id },
+      update: {},
+    });
+    await prisma.pushSubscription.create({
+      data: {
+        profileId: exportProfile.id,
+        endpoint: `https://push.vintra.test/private-${userId}`,
+        p256dh: `private-p256dh-${userId}`,
+        auth: `private-auth-${userId}`,
+        userAgent: "Settings integration test",
+      },
+    });
     const profileExport = await createAccountExport(userId, "profile");
     const fullExport = await createAccountExport(userId, "full");
     expect(profileExport).not.toBeNull();
@@ -151,10 +171,17 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")("paramètres avec Post
     if (!profileExport || !fullExport) return;
 
     expect("analyses" in profileExport).toBe(false);
+    expect("notifications" in fullExport).toBe(true);
     expect(fullExport.sessions).toHaveLength(1);
+    expect(fullExport.notifications ?? []).not.toHaveLength(0);
+    expect(fullExport.notificationPreferences).not.toBeNull();
+    expect(fullExport.pushDevices).toHaveLength(1);
     const serialized = JSON.stringify(fullExport);
     expect(serialized).not.toContain("password-hash-that-must-not-be-exported");
     expect(serialized).not.toContain(`private-token-${userId}`);
+    expect(serialized).not.toContain(`https://push.vintra.test/private-${userId}`);
+    expect(serialized).not.toContain(`private-p256dh-${userId}`);
+    expect(serialized).not.toContain(`private-auth-${userId}`);
   });
 
   it("branche les opérations Better Auth et refuse une suppression mal confirmée", async () => {
@@ -170,6 +197,11 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")("paramètres avec Post
     expect((await revokeOtherSessions()).success).toBe(true);
     expect((await revokeAllSessions()).success).toBe(true);
     expect(mocks.changePassword).toHaveBeenCalledOnce();
+    expect(
+      await prisma.notification.count({
+        where: { profile: { userId }, type: "SECURITY", title: "Mot de passe modifié" },
+      }),
+    ).toBe(1);
     expect(mocks.revokeOtherSessions).toHaveBeenCalledOnce();
     expect(mocks.revokeSessions).toHaveBeenCalledOnce();
 

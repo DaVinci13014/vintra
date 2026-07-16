@@ -4,6 +4,7 @@ import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 
 import { prisma } from "@/shared/api/database";
+import { createSecurityNotificationForUser } from "@/entities/notification/server";
 import { sendAuthEmail } from "@/shared/api/email";
 import { serverEnv } from "@/shared/config/server";
 import { hashPassword, verifyPassword } from "../lib/password";
@@ -51,6 +52,22 @@ export const auth = betterAuth({
             update: {},
             create: { userId: user.id },
           });
+        },
+      },
+    },
+    session: {
+      create: {
+        after: async (session) => {
+          try {
+            await createSecurityNotificationForUser({
+              userId: session.userId,
+              title: "Nouvelle connexion",
+              description: "Une nouvelle session a été ouverte sur votre compte Vintra.",
+              dedupeKey: `security:session:${session.id}`,
+            });
+          } catch {
+            return;
+          }
         },
       },
     },

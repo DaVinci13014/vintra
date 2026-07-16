@@ -84,13 +84,21 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
         id: created.data.id,
         title: "Grand voyage",
         description: "",
-        targetAmount: 14_000,
+        targetAmount: 6_000,
         targetDate: "2031-01",
       });
       expect(updated.success).toBe(true);
       expect((await prisma.goal.findUniqueOrThrow({ where: { id: created.data.id } })).title).toBe(
         "Grand voyage",
       );
+      expect(
+        await prisma.notification.count({
+          where: {
+            profile: { userId },
+            dedupeKey: `goal:${created.data.id}:milestone:25`,
+          },
+        }),
+      ).toBe(1);
 
       expect((await archiveGoal(created.data.id)).success).toBe(true);
       expect(await prisma.goal.count({ where: { profile: { userId }, status: "ACTIVE" } })).toBe(0);

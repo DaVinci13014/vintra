@@ -1,8 +1,10 @@
+import { ensureWeeklySummary } from "@/entities/notification/server";
 import { prisma } from "@/shared/api/database";
 
 export type DashboardData = Awaited<ReturnType<typeof getDashboardData>>;
 
 export async function getDashboardData(userId: string) {
+  await ensureWeeklySummary(userId);
   const profile = await prisma.profile.findUnique({
     where: { userId },
     select: {
@@ -65,6 +67,7 @@ export async function getDashboardData(userId: string) {
         take: 120,
         select: { amount: true, recordedAt: true },
       },
+      _count: { select: { notifications: { where: { status: "UNREAD" } } } },
     },
   });
 
@@ -134,6 +137,7 @@ export async function getDashboardData(userId: string) {
         }
       : null,
     recommendations,
+    unreadNotificationCount: profile._count.notifications,
     savingsHistory: profile.savingsSnapshots
       .map((snapshot) => ({
         amount: snapshot.amount.toNumber(),

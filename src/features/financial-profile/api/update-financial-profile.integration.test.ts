@@ -90,6 +90,7 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
           goals: { where: { status: { in: ["ACTIVE", "COMPLETED"] } } },
           savingPlans: { where: { status: { in: ["ACTIVE", "COMPLETED"] } } },
           recommendations: { where: { status: { not: "ARCHIVED" } } },
+          notifications: true,
         },
       });
       expect(profile.financialProfiles).toHaveLength(2);
@@ -97,6 +98,12 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
       expect(profile.hasSavings).toBe(false);
       expect(profile.goals[0]?.currentAmount.toNumber()).toBe(0);
       expect(profile.savingPlans).toHaveLength(1);
+      expect(
+        profile.notifications.filter((notification) => notification.type === "SYSTEM"),
+      ).toHaveLength(1);
+      expect(
+        profile.notifications.filter((notification) => notification.type === "RECOMMENDATION"),
+      ).toHaveLength(2);
     });
   },
 );

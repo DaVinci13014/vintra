@@ -72,6 +72,7 @@ describe.runIf(runDatabaseTests)("runInitialAnalysis avec PostgreSQL", () => {
         savingPlans: true,
         recommendations: true,
         savingsSnapshots: true,
+        notifications: true,
       },
     });
 
@@ -83,5 +84,8 @@ describe.runIf(runDatabaseTests)("runInitialAnalysis avec PostgreSQL", () => {
     expect(profile.savingPlans).toHaveLength(1);
     expect(profile.recommendations.length).toBeGreaterThan(0);
     expect(profile.savingsSnapshots).toHaveLength(1);
+    expect(
+      profile.notifications.filter((notification) => notification.type === "RECOMMENDATION"),
+    ).toHaveLength(1);
   });
 });

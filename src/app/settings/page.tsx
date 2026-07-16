@@ -1,5 +1,6 @@
 import {
   ChevronRight,
+  BellRing,
   CircleHelp,
   LockKeyhole,
   Palette,
@@ -27,6 +28,12 @@ const SECTIONS = [
     title: "Préférences",
     description: "Langue, devise et apparence",
     icon: Palette,
+  },
+  {
+    href: "/settings/notifications",
+    title: "Notifications",
+    description: "Centre, Push et alertes de sécurité",
+    icon: BellRing,
   },
   {
     href: "/settings/security",

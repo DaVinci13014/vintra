@@ -4,6 +4,7 @@ import { Buffer } from "node:buffer";
 import { revalidatePath } from "next/cache";
 
 import type { ApiResponse } from "@/shared/api";
+import { createNotification } from "@/entities/notification/server";
 import { prisma } from "@/shared/api/database";
 import { avatarSchema, personalSettingsSchema } from "../model/settings-schemas";
 import { failure, getSettingsContext } from "./settings-context";
@@ -28,6 +29,10 @@ export async function updatePersonalSettings(
 
   try {
     await prisma.$transaction(async (transaction) => {
+      const previous = await transaction.profile.findUniqueOrThrow({
+        where: { userId: context.data.userId },
+        select: { id: true, profession: true },
+      });
       await transaction.user.update({
         where: { id: context.data.userId },
         data: {
@@ -46,6 +51,16 @@ export async function updatePersonalSettings(
       await transaction.auditLog.create({
         data: { userId: context.data.userId, action: "PROFILE_UPDATED" },
       });
+      if (previous.profession !== parsed.data.profession) {
+        await createNotification(transaction, {
+          profileId: previous.id,
+          title: "Situation professionnelle mise à jour",
+          description: "Votre profil personnel tient compte de votre nouvelle situation.",
+          type: "SYSTEM",
+          priority: "LOW",
+          actionUrl: "/settings/profile",
+        });
+      }
     });
   } catch {
     return failure("PROFILE_UPDATE_FAILED", "Votre profil n’a pas pu être mis à jour.");

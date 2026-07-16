@@ -1,5 +1,4 @@
 import {
-  Bell,
   CalendarClock,
   CircleDollarSign,
   Gauge,
@@ -15,6 +14,7 @@ import {
 import Link from "next/link";
 
 import type { DashboardData } from "@/features/dashboard";
+import { NotificationBell } from "@/features/notifications/ui";
 import { Logo } from "@/shared/ui";
 import { SavingsHistoryChart } from "./savings-history-chart";
 
@@ -54,13 +54,7 @@ export function DashboardPage({
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <Logo priority />
           <nav className="flex items-center gap-2" aria-label="Actions du compte">
-            <button
-              disabled
-              className="grid size-11 place-items-center rounded-xl border border-border bg-card text-muted"
-              aria-label="Notifications — bientôt disponible"
-            >
-              <Bell size={19} aria-hidden="true" />
-            </button>
+            <NotificationBell initialCount={data.unreadNotificationCount} />
             <Link
               href="/settings"
               className="grid size-11 place-items-center rounded-xl border border-border bg-card text-muted transition hover:text-foreground"
