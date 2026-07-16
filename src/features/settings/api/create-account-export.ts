@@ -12,6 +12,17 @@ export async function createAccountExport(userId: string, scope: "profile" | "fu
       image: true,
       createdAt: true,
       updatedAt: true,
+      sessions: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          createdAt: true,
+          updatedAt: true,
+          expiresAt: true,
+          ipAddress: true,
+          userAgent: true,
+        },
+      },
       profile: {
         select: {
           birthDate: true,
@@ -168,6 +179,12 @@ export async function createAccountExport(userId: string, scope: "profile" | "fu
     auditTrail: user.auditLogs.map((log) => ({
       ...log,
       createdAt: log.createdAt.toISOString(),
+    })),
+    sessions: user.sessions.map((session) => ({
+      ...session,
+      createdAt: session.createdAt.toISOString(),
+      updatedAt: session.updatedAt.toISOString(),
+      expiresAt: session.expiresAt.toISOString(),
     })),
   };
 }

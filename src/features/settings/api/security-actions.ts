@@ -30,15 +30,13 @@ export async function changePassword(input: unknown): Promise<ApiResponse<{ chan
         revokeOtherSessions: true,
       },
     });
-    await prisma.auditLog.create({
-      data: { userId: context.data.userId, action: "PASSWORD_CHANGED" },
-    });
   } catch (error) {
     if (getErrorCode(error) === "INVALID_PASSWORD") {
       return failure("INVALID_PASSWORD", "Le mot de passe actuel est incorrect.");
     }
     return failure("PASSWORD_UPDATE_FAILED", "Le mot de passe n’a pas pu être modifié.");
   }
+  await recordAudit(context.data.userId, "PASSWORD_CHANGED");
 
   revalidatePath("/settings/security");
   return { success: true, data: { changed: true } };
@@ -50,12 +48,10 @@ export async function revokeOtherSessions(): Promise<ApiResponse<{ revoked: true
 
   try {
     await auth.api.revokeOtherSessions({ headers: await headers() });
-    await prisma.auditLog.create({
-      data: { userId: context.data.userId, action: "SESSIONS_REVOKED" },
-    });
   } catch {
     return failure("SESSION_REVOCATION_FAILED", "Les autres sessions n’ont pas pu être fermées.");
   }
+  await recordAudit(context.data.userId, "SESSIONS_REVOKED");
 
   revalidatePath("/settings/security");
   return { success: true, data: { revoked: true } };
@@ -67,12 +63,10 @@ export async function revokeAllSessions(): Promise<ApiResponse<{ revoked: true }
 
   try {
     await auth.api.revokeSessions({ headers: await headers() });
-    await prisma.auditLog.create({
-      data: { userId: context.data.userId, action: "SESSIONS_REVOKED" },
-    });
   } catch {
     return failure("SESSION_REVOCATION_FAILED", "Les sessions n’ont pas pu être fermées.");
   }
+  await recordAudit(context.data.userId, "SESSIONS_REVOKED");
 
   return { success: true, data: { revoked: true } };
 }
@@ -86,4 +80,13 @@ function getErrorCode(error: unknown) {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
+}
+
+async function recordAudit(userId: string, action: "PASSWORD_CHANGED" | "SESSIONS_REVOKED") {
+  try {
+    await prisma.auditLog.create({ data: { userId, action } });
+  } catch {
+    return false;
+  }
+  return true;
 }

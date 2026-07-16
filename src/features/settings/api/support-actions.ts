@@ -22,17 +22,17 @@ export async function createSupportRequest(
     );
   }
 
-  const recentRequestCount = await prisma.supportRequest.count({
-    where: {
-      userId: context.data.userId,
-      createdAt: { gte: new Date(Date.now() - REQUEST_WINDOW_MS) },
-    },
-  });
-  if (recentRequestCount >= MAX_REQUESTS_PER_WINDOW) {
-    return failure("RATE_LIMITED", "Trop de demandes ont été envoyées. Réessayez plus tard.");
-  }
-
   try {
+    const recentRequestCount = await prisma.supportRequest.count({
+      where: {
+        userId: context.data.userId,
+        createdAt: { gte: new Date(Date.now() - REQUEST_WINDOW_MS) },
+      },
+    });
+    if (recentRequestCount >= MAX_REQUESTS_PER_WINDOW) {
+      return failure("RATE_LIMITED", "Trop de demandes ont été envoyées. Réessayez plus tard.");
+    }
+
     await prisma.$transaction([
       prisma.supportRequest.create({
         data: {

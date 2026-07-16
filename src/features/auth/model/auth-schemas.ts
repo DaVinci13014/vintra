@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const NAME_PATTERN = /^[\p{L}\p{M}' -]+$/u;
+const NAME_PATTERN = /^[\p{L}\p{M}'’ -]+$/u;
 const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
 
 export const signInSchema = z.object({

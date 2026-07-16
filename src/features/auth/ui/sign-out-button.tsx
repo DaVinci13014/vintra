@@ -3,23 +3,37 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { signOut } from "@/features/auth/client";
 import { Button } from "@/shared/ui";
-import { authClient } from "../api/auth-client";
 
 export function SignOutButton() {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  async function signOut() {
+  async function submit() {
     setIsPending(true);
-    await authClient.signOut();
-    router.replace("/connexion");
+    setError(null);
+    const response = await signOut();
+    if (!response.success) {
+      setError(response.error.message);
+      setIsPending(false);
+      return;
+    }
+    router.replace(response.data.destination);
     router.refresh();
   }
 
   return (
-    <Button variant="secondary" onClick={signOut} disabled={isPending}>
-      {isPending ? "Déconnexion..." : "Se déconnecter"}
-    </Button>
+    <div>
+      <Button variant="secondary" onClick={submit} disabled={isPending}>
+        {isPending ? "Déconnexion..." : "Se déconnecter"}
+      </Button>
+      {error && (
+        <p className="mt-3 text-sm text-danger" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

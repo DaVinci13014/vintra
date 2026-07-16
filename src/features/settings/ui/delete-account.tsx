@@ -2,24 +2,31 @@
 
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 import { authClient } from "@/features/auth/client";
-import {
-  deleteAccount,
-  deleteAccountSchema,
-  type DeleteAccountInput,
-} from "@/features/settings/client";
+import { deleteAccount, deleteAccountSchema } from "@/features/settings/client";
 import { Button, Field, Input } from "@/shared/ui";
 
-const INITIAL_VALUES: DeleteAccountInput = { confirmation: "" as "SUPPRIMER", password: "" };
+const INITIAL_VALUES = { confirmation: "", password: "" };
 
 export function DeleteAccount({ email }: { email: string }) {
   const router = useRouter();
+  const confirmationInput = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState(INITIAL_VALUES);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (open) confirmationInput.current?.focus();
+  }, [open]);
+
+  function closeDialog() {
+    setOpen(false);
+    setError(null);
+    setValues(INITIAL_VALUES);
+  }
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -59,6 +66,9 @@ export function DeleteAccount({ email }: { email: string }) {
           role="dialog"
           aria-modal="true"
           aria-labelledby="delete-account-title"
+          onKeyDown={(event) => {
+            if (event.key === "Escape" && !isPending) closeDialog();
+          }}
         >
           <form
             className="w-full max-w-lg rounded-3xl border border-danger/40 bg-surface p-6 shadow-2xl sm:p-8"
@@ -75,11 +85,10 @@ export function DeleteAccount({ email }: { email: string }) {
             <div className="mt-6 grid gap-5">
               <Field label="Saisissez SUPPRIMER" htmlFor="deleteConfirmation">
                 <Input
+                  ref={confirmationInput}
                   id="deleteConfirmation"
                   value={values.confirmation}
-                  onChange={(event) =>
-                    setValues({ ...values, confirmation: event.target.value as "SUPPRIMER" })
-                  }
+                  onChange={(event) => setValues({ ...values, confirmation: event.target.value })}
                   autoComplete="off"
                   required
                 />
@@ -104,16 +113,7 @@ export function DeleteAccount({ email }: { email: string }) {
               </p>
             )}
             <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <Button
-                type="button"
-                variant="ghost"
-                disabled={isPending}
-                onClick={() => {
-                  setOpen(false);
-                  setError(null);
-                  setValues(INITIAL_VALUES);
-                }}
-              >
+              <Button type="button" variant="ghost" disabled={isPending} onClick={closeDialog}>
                 Annuler
               </Button>
               <Button

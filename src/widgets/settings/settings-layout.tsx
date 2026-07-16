@@ -37,14 +37,14 @@ export function SettingsLayout({ children, active }: { children: ReactNode; acti
         </Link>
       </header>
 
-      <div className="mx-auto grid max-w-6xl gap-8 py-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:py-12">
-        <aside>
+      <div className="mx-auto grid w-full min-w-0 max-w-6xl gap-8 py-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:py-12">
+        <aside className="min-w-0">
           <Link href="/settings" className="block rounded-xl px-3 py-2">
             <p className="text-sm font-medium text-brand">Votre espace</p>
             <p className="mt-1 text-2xl font-semibold">Paramètres</p>
           </Link>
           <nav
-            className="mt-4 flex gap-2 overflow-x-auto pb-2 lg:grid lg:overflow-visible"
+            className="mt-4 flex w-full max-w-full gap-2 overflow-x-auto pb-2 lg:grid lg:overflow-visible"
             aria-label="Sections des paramètres"
           >
             {NAVIGATION.map(({ id, href, label, icon: Icon }) => (

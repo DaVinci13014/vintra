@@ -6,7 +6,7 @@ import {
   themePreferenceSchema,
 } from "@/shared/config";
 
-const NAME_PATTERN = /^[\p{L}\p{M}' -]+$/u;
+const NAME_PATTERN = /^[\p{L}\p{M}'’ -]+$/u;
 const PASSWORD_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 

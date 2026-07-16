@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 
-import { serverEnv } from "@/shared/config";
+import { serverEnv } from "@/shared/config/server";
 
 type AuthEmail = {
   to: string;

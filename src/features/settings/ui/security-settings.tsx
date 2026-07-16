@@ -219,6 +219,9 @@ export function SecuritySettings({ sessions }: { sessions: SessionView[] }) {
           role="dialog"
           aria-modal="true"
           aria-labelledby="revoke-sessions-title"
+          onKeyDown={(event) => {
+            if (event.key === "Escape" && !isPending) setConfirmAllSessions(false);
+          }}
         >
           <div className="w-full max-w-md rounded-3xl border border-border bg-surface p-6 shadow-2xl">
             <h2 id="revoke-sessions-title" className="text-xl font-semibold">
@@ -231,6 +234,7 @@ export function SecuritySettings({ sessions }: { sessions: SessionView[] }) {
               <Button
                 type="button"
                 variant="ghost"
+                autoFocus
                 disabled={isPending}
                 onClick={() => setConfirmAllSessions(false)}
               >

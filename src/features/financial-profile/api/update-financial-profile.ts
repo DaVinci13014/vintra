@@ -122,6 +122,9 @@ export async function updateFinancialProfile(
           await transaction.savingPlan.update({ where: { id: activePlan.id }, data: planData });
         else await transaction.savingPlan.create({ data: { profileId: profile.id, ...planData } });
       }
+      await transaction.auditLog.create({
+        data: { userId: session.user.id, action: "PROFILE_UPDATED" },
+      });
     });
     revalidatePath("/dashboard");
     revalidatePath("/profile");

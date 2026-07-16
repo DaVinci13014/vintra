@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 
 import { auth } from "@/features/auth/server";
 import { prisma } from "@/shared/api/database";
+import { currencyPreferenceSchema } from "@/shared/config";
 
 export async function getSettingsOverview(userId: string) {
   const user = await prisma.user.findUnique({
@@ -29,12 +30,14 @@ export async function getSettingsOverview(userId: string) {
   });
 
   if (!user?.profile) return null;
+  const currency = currencyPreferenceSchema.safeParse(user.profile.currency);
 
   return {
     ...user,
     createdAt: user.createdAt.toISOString(),
     profile: {
       ...user.profile,
+      currency: currency.success ? currency.data : "EUR",
       birthDate: user.profile.birthDate?.toISOString().slice(0, 10) ?? "",
     },
     supportRequestCount: user._count.supportRequests,

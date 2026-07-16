@@ -39,7 +39,9 @@ export function PersonalSettingsForm({
   const [image, setImage] = useState(initialImage);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isPreparingImage, setIsPreparingImage] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const isBusy = isPending || isPreparingImage;
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -76,6 +78,7 @@ export function PersonalSettingsForm({
       return;
     }
 
+    setIsPreparingImage(true);
     try {
       const dataUrl = await compressAvatar(file);
       startTransition(async () => {
@@ -89,6 +92,8 @@ export function PersonalSettingsForm({
       });
     } catch {
       setError("L’image n’a pas pu être préparée.");
+    } finally {
+      setIsPreparingImage(false);
     }
   }
 
@@ -138,14 +143,14 @@ export function PersonalSettingsForm({
             <Button
               type="button"
               variant="secondary"
-              disabled={isPending}
+              disabled={isBusy}
               onClick={() => fileInput.current?.click()}
             >
               <ImagePlus size={18} aria-hidden="true" />
-              Choisir une photo
+              {isPreparingImage ? "Préparation..." : "Choisir une photo"}
             </Button>
             {image && (
-              <Button type="button" variant="ghost" disabled={isPending} onClick={deleteAvatar}>
+              <Button type="button" variant="ghost" disabled={isBusy} onClick={deleteAvatar}>
                 <Trash2 size={18} aria-hidden="true" />
                 Supprimer
               </Button>
@@ -215,7 +220,7 @@ export function PersonalSettingsForm({
           </Field>
         </div>
         <div className="mt-8">
-          <Button type="submit" disabled={isPending}>
+          <Button type="submit" disabled={isBusy}>
             {isPending ? "Enregistrement..." : "Enregistrer mon profil"}
           </Button>
         </div>

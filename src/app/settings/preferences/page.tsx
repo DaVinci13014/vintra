@@ -24,7 +24,7 @@ export default async function SettingsPreferencesPage() {
         <PreferencesForm
           initialValues={{
             locale: data.profile.locale,
-            currency: data.profile.currency as "EUR" | "USD" | "GBP" | "CHF" | "CAD",
+            currency: data.profile.currency,
             theme: data.profile.theme,
           }}
         />

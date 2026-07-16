@@ -5,7 +5,7 @@ import { nextCookies } from "better-auth/next-js";
 
 import { prisma } from "@/shared/api/database";
 import { sendAuthEmail } from "@/shared/api/email";
-import { serverEnv } from "@/shared/config";
+import { serverEnv } from "@/shared/config/server";
 import { hashPassword, verifyPassword } from "../lib/password";
 
 const hasEmailProvider = Boolean(serverEnv.RESEND_API_KEY && serverEnv.EMAIL_FROM);

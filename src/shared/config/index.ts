@@ -1,4 +1,3 @@
-export { serverEnv } from "./server-env";
 export {
   currencyPreferenceSchema,
   LOCALE_COOKIE_NAME,
