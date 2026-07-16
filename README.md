@@ -9,7 +9,7 @@ pnpm install
 pnpm dev
 ```
 
-Ouvrir ensuite [http://localhost:13014](http://localhost:13014).
+Ouvrir ensuite [http://localhost:13015](http://localhost:13015).
 
 ## Emails de confirmation
 
