@@ -11,6 +11,10 @@ const serverEnvSchema = z
     DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(20).default(1),
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.url(),
+    REQUIRE_EMAIL_VERIFICATION: z
+      .enum(["true", "false"])
+      .default("true")
+      .transform((value) => value === "true"),
     CRON_SECRET: z.string().min(16).optional(),
     LOG_LEVEL: z
       .enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"])
@@ -66,6 +70,7 @@ const parsedEnv = serverEnvSchema.safeParse({
   DATABASE_POOL_MAX: process.env.DATABASE_POOL_MAX,
   BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
   BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
+  REQUIRE_EMAIL_VERIFICATION: process.env.REQUIRE_EMAIL_VERIFICATION || undefined,
   CRON_SECRET: process.env.CRON_SECRET || undefined,
   LOG_LEVEL: process.env.LOG_LEVEL,
   APP_VERSION: process.env.APP_VERSION,

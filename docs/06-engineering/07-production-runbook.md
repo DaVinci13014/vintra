@@ -76,6 +76,7 @@ Renseigner les variables dans **Settings > Environment Variables**. Les valeurs 
 | `DATABASE_POOL_MAX` | `1` | `1` | non |
 | `BETTER_AUTH_SECRET` | secret aléatoire distinct | autre secret aléatoire | oui |
 | `BETTER_AUTH_URL` | URL publique définitive | URL publique définitive, remplacée automatiquement sur l’aperçu | non |
+| `REQUIRE_EMAIL_VERIFICATION` | `true` | `true` | non |
 | `CRON_SECRET` | secret aléatoire de 32 octets | secret distinct | oui |
 | `RESEND_API_KEY` | clé Resend | clé de test ou domaine de test | oui |
 | `EMAIL_FROM` | expéditeur vérifié | expéditeur de test | non |
