@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { ImagePlus, Trash2 } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 
@@ -13,7 +12,7 @@ import {
   updatePersonalSettings,
   type PersonalSettingsInput,
 } from "@/features/settings/client";
-import { Button, ConfirmationDialog, Field, Input } from "@/shared/ui";
+import { Avatar, Button, ConfirmationDialog, Field, Input } from "@/shared/ui";
 
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -160,20 +159,7 @@ export function PersonalSettingsForm({
         <h2 className="text-lg font-semibold">Photo de profil</h2>
         <p className="mt-1 text-sm text-secondary-text">JPG, PNG ou WEBP · 5 Mo maximum.</p>
         <div className="mt-6 flex flex-col gap-5 sm:flex-row sm:items-center">
-          {image ? (
-            <Image
-              src={image}
-              alt="Photo de profil actuelle"
-              width={96}
-              height={96}
-              unoptimized
-              className="size-24 rounded-3xl object-cover"
-            />
-          ) : (
-            <div className="grid size-24 place-items-center rounded-3xl bg-card text-secondary-text">
-              <ImagePlus aria-hidden="true" />
-            </div>
-          )}
+          <Avatar firstName={values.firstName} lastName={values.lastName} image={image} size="xl" />
           <div className="flex flex-wrap gap-3">
             <input
               ref={fileInput}

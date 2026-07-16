@@ -12,7 +12,7 @@ export default async function NotificationSettingsPage() {
   if (!data) redirect("/onboarding");
 
   return (
-    <SettingsLayout active="notifications">
+    <SettingsLayout active="notifications" user={session.user}>
       <p className="text-sm font-medium text-brand">Notifications</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
         Choisir vos alertes

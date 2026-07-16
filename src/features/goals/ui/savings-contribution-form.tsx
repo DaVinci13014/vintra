@@ -162,9 +162,9 @@ export function SavingsContributionForm({
               <div className="mx-auto grid size-16 place-items-center rounded-2xl bg-brand/15 text-brand">
                 <PartyPopper size={30} aria-hidden="true" />
               </div>
-              <p className="mt-6 text-sm font-medium text-brand">Objectif atteint</p>
+              <p className="mt-6 text-sm font-medium text-brand">Versement enregistré</p>
               <h2 id="celebration-title" className="mt-2 text-2xl font-semibold sm:text-3xl">
-                Félicitations !
+                Objectif atteint
               </h2>
               <p className="mx-auto mt-4 max-w-sm leading-7 text-secondary-text">
                 Vous avez atteint « {celebration.title} » avec{" "}

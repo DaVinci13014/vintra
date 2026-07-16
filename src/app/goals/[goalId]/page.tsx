@@ -57,8 +57,8 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ goa
       </div>
       {goal.status === "PLANNED" && (
         <p className="mt-5 max-w-3xl rounded-2xl border border-brand/25 bg-brand/10 p-4 text-sm leading-6 text-secondary-text">
-          Cette projection suit votre épargne actuelle. En la définissant comme principale, votre
-          plan d’épargne actif basculera automatiquement vers cet objectif.
+          Cette projection utilise votre épargne actuelle. En faire votre priorité remplacera le
+          plan d’épargne actif.
         </p>
       )}
       <section className="mt-10 rounded-3xl border border-border bg-surface p-5 sm:p-8">

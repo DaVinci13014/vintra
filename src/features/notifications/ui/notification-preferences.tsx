@@ -27,7 +27,7 @@ const OPTIONS = [
   {
     key: "recommendationsPush",
     title: "Nouvelles recommandations",
-    description: "Nouvelles opportunités détectées par votre analyse.",
+    description: "Nouveaux conseils liés à votre budget.",
   },
   {
     key: "weeklySummaryPush",

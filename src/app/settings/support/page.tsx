@@ -32,7 +32,7 @@ export default async function SettingsSupportPage() {
   if (!session.user.emailVerified) redirect("/verification-email");
 
   return (
-    <SettingsLayout active="support">
+    <SettingsLayout active="support" user={session.user}>
       <p className="text-sm font-medium text-brand">Support</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
         Comment pouvons-nous vous aider ?

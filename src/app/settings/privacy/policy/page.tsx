@@ -9,7 +9,7 @@ export default async function PrivacyPolicyPage() {
   if (!session.user.emailVerified) redirect("/verification-email");
 
   return (
-    <SettingsLayout active="privacy">
+    <SettingsLayout active="privacy" user={session.user}>
       <p className="text-sm font-medium text-brand">Confidentialité</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
         Politique de confidentialité

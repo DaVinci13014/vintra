@@ -23,63 +23,63 @@
 
 :root {
   color-scheme: dark;
-  --background: #09090b;
+  --background: #0a0a0b;
   --surface: #111113;
   --card: #18181b;
-  --elevated: #202024;
-  --border: #2a2a2e;
-  --divider: #313135;
-  --text-primary: #ffffff;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
-  --brand: #4ade80;
-  --brand-foreground: #09090b;
-  --secondary: #3b82f6;
-  --success: #22c55e;
+  --elevated: #222225;
+  --border: #303034;
+  --divider: #3f3f46;
+  --text-primary: #fafafa;
+  --text-secondary: #d4d4d8;
+  --text-muted: #a1a1aa;
+  --brand: #fafafa;
+  --brand-foreground: #18181b;
+  --secondary: #d4d4d8;
+  --success: #e4e4e7;
   --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #38bdf8;
+  --danger: #f87171;
+  --info: #d4d4d8;
 }
 
 [data-theme="light"] {
   color-scheme: light;
-  --background: #f8fafc;
+  --background: #f4f4f5;
   --surface: #ffffff;
-  --card: #f1f5f9;
-  --elevated: #e2e8f0;
+  --card: #fafafa;
+  --elevated: #e4e4e7;
   --border: #d4d4d8;
-  --divider: #cbd5e1;
+  --divider: #a1a1aa;
   --text-primary: #18181b;
   --text-secondary: #52525b;
   --text-muted: #71717a;
-  --brand: #15803d;
+  --brand: #18181b;
   --brand-foreground: #ffffff;
-  --secondary: #2563eb;
-  --success: #15803d;
+  --secondary: #52525b;
+  --success: #3f3f46;
   --warning: #b45309;
   --danger: #dc2626;
-  --info: #0369a1;
+  --info: #52525b;
 }
 
 @media (prefers-color-scheme: light) {
   [data-theme="system"] {
     color-scheme: light;
-    --background: #f8fafc;
+    --background: #f4f4f5;
     --surface: #ffffff;
-    --card: #f1f5f9;
-    --elevated: #e2e8f0;
+    --card: #fafafa;
+    --elevated: #e4e4e7;
     --border: #d4d4d8;
-    --divider: #cbd5e1;
+    --divider: #a1a1aa;
     --text-primary: #18181b;
     --text-secondary: #52525b;
     --text-muted: #71717a;
-    --brand: #15803d;
+    --brand: #18181b;
     --brand-foreground: #ffffff;
-    --secondary: #2563eb;
-    --success: #15803d;
+    --secondary: #52525b;
+    --success: #3f3f46;
     --warning: #b45309;
     --danger: #dc2626;
-    --info: #0369a1;
+    --info: #52525b;
   }
 }
 

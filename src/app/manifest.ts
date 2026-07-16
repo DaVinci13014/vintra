@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    background_color: "#090b10",
+    background_color: "#0a0a0b",
     description: "Coach financier personnel pour comprendre et améliorer son épargne.",
     display: "standalone",
     icons: [
@@ -16,6 +16,6 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Vintra",
     short_name: "Vintra",
     start_url: "/",
-    theme_color: "#090b10",
+    theme_color: "#0a0a0b",
   };
 }

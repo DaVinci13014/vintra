@@ -114,8 +114,8 @@ export async function createRecommendationNotification(
     title: input.count === 1 ? "Nouvelle recommandation" : "Nouvelles recommandations",
     description:
       input.count === 1
-        ? "Une nouvelle opportunité d’économiser est disponible."
-        : `${input.count} nouvelles opportunités d’économiser sont disponibles.`,
+        ? "Un nouveau conseil d’épargne est disponible."
+        : `${input.count} nouveaux conseils d’épargne sont disponibles.`,
     type: "RECOMMENDATION",
     priority: "MEDIUM",
     actionUrl: "/recommendations",

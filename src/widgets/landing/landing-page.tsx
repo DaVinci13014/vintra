@@ -21,12 +21,11 @@ export function LandingPage() {
             <div className="max-w-2xl">
               <p className="mb-6 text-sm font-medium text-brand">Coach financier personnel</p>
               <h1 className="text-[clamp(3.5rem,7.5vw,7.5rem)] font-semibold leading-[0.9] tracking-[-0.065em]">
-                Prenez le contrôle.
-                <span className="mt-4 block text-secondary-text">Simplement.</span>
+                Voyez clair dans vos finances.
               </h1>
               <p className="mt-10 max-w-xl text-lg leading-7 text-secondary-text sm:text-xl sm:leading-8">
-                Vintra vous aide à comprendre vos finances et à construire votre épargne à votre
-                rythme.
+                Revenus, dépenses, épargne : retrouvez l’essentiel au même endroit, sans connecter
+                votre banque.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <Button asChild size="lg">
@@ -38,7 +37,7 @@ export function LandingPage() {
           </div>
 
           <div className="flex items-center justify-between border-t border-divider pt-5 text-xs text-muted">
-            <span>Analyse personnalisée</span>
+            <span>Chiffres expliqués</span>
             <span>Données privées</span>
           </div>
         </div>

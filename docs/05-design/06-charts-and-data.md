@@ -84,13 +84,13 @@ Toutes les couleurs proviennent exclusivement des Design Tokens.
 
 Primary
 
-Vintra Green
+White
 
 Progression
 
 ---
 
-Blue
+Light Gray
 
 Information
 
@@ -446,7 +446,7 @@ Mobile
 
 Toujours
 
-Vert
+Blanc ou gris clair selon le contraste du thème
 
 +
 

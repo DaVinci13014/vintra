@@ -1,3 +1,4 @@
+export { Avatar } from "./avatar";
 export { Button } from "./button";
 export { ConfirmationDialog } from "./confirmation-dialog";
 export { ReloadErrorState } from "./error-state";

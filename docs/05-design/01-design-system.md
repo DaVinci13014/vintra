@@ -241,13 +241,13 @@ La couleur attire naturellement l'œil.
 
 Elle ne doit donc jamais être utilisée sans raison.
 
-Le vert indique une réussite ou une progression.
+Le blanc met en avant une action ou une progression sur fond sombre.
 
-Le rouge indique une erreur ou une perte.
+Les gris structurent l'interface et hiérarchisent l'information.
 
-Le bleu indique une information.
+Le rouge reste réservé aux erreurs, pertes et actions dangereuses.
 
-Le gris structure l'interface.
+L'ambre reste réservé aux avertissements.
 
 Aucune autre couleur ne doit être introduite sans justification.
 

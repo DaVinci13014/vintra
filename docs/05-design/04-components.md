@@ -400,19 +400,21 @@ Circle
 
 Sizes
 
+24
+
 32
 
-40
-
-48
+44
 
 64
+
+96
 
 ---
 
 Fallback
 
-Initiales utilisateur.
+Initiales du prénom et du nom sur un fond contrasté avec le thème.
 
 ---
 

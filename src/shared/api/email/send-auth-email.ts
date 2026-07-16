@@ -45,7 +45,7 @@ export async function sendAuthEmail(input: unknown) {
     to: email.to,
     subject: email.subject,
     text: `${email.heading}\n\n${email.message}\n\n${email.actionUrl}`,
-    html: `<div style="font-family:Arial,sans-serif;background:#09090b;color:#fff;padding:32px"><h1>${escapeHtml(email.heading)}</h1><p style="color:#a1a1aa">${escapeHtml(email.message)}</p><a href="${escapeHtml(email.actionUrl)}" style="display:inline-block;margin-top:16px;padding:12px 20px;border-radius:12px;background:#4ade80;color:#09090b;text-decoration:none;font-weight:600">${escapeHtml(email.actionLabel)}</a></div>`,
+    html: `<div style="font-family:Arial,sans-serif;background:#0a0a0b;color:#fafafa;padding:32px"><h1>${escapeHtml(email.heading)}</h1><p style="color:#d4d4d8">${escapeHtml(email.message)}</p><a href="${escapeHtml(email.actionUrl)}" style="display:inline-block;margin-top:16px;padding:12px 20px;border-radius:12px;background:#fafafa;color:#18181b;text-decoration:none;font-weight:600">${escapeHtml(email.actionLabel)}</a></div>`,
   });
 
   if (error) {

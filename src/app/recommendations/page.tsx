@@ -49,8 +49,7 @@ export default async function RecommendationsPage() {
           Recommandations
         </h1>
         <p className="mt-3 max-w-2xl text-secondary-text">
-          Des actions personnalisées à partir de votre situation financière, classées par impact et
-          facilité de mise en œuvre.
+          Commencez par les actions qui ont le plus d’impact sur votre budget.
         </p>
       </div>
 

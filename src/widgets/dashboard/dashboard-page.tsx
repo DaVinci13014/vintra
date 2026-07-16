@@ -10,13 +10,12 @@ import {
   Target,
   TrendingDown,
   WalletCards,
-  UserRound,
 } from "lucide-react";
 import Link from "next/link";
 
 import type { DashboardData } from "@/features/dashboard";
 import { NotificationBell } from "@/features/notifications/ui";
-import { Logo } from "@/shared/ui";
+import { Avatar, Logo } from "@/shared/ui";
 import { SavingsHistoryChart } from "./savings-history-chart";
 
 type CompletedDashboardData = Extract<DashboardData, { completed: true }>;
@@ -37,10 +36,10 @@ const DIFFICULTY_LABELS = {
 
 export function DashboardPage({
   data,
-  firstName,
+  user,
 }: {
   data: CompletedDashboardData;
-  firstName: string;
+  user: { firstName: string; lastName: string; image?: string | null };
 }) {
   const money = new Intl.NumberFormat("fr-FR", {
     style: "currency",
@@ -58,10 +57,15 @@ export function DashboardPage({
             <NotificationBell initialCount={data.unreadNotificationCount} />
             <Link
               href="/settings"
-              className="grid size-11 place-items-center rounded-xl border border-border bg-card text-muted transition hover:text-foreground"
-              aria-label="Paramètres"
+              className="grid size-11 place-items-center rounded-full outline-none transition hover:opacity-80 focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              aria-label="Ouvrir mon profil"
             >
-              <Settings size={19} aria-hidden="true" />
+              <Avatar
+                firstName={user.firstName}
+                lastName={user.lastName}
+                image={user.image}
+                size="md"
+              />
             </Link>
           </nav>
         </div>
@@ -69,9 +73,9 @@ export function DashboardPage({
 
       <div className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-8 sm:py-12">
         <section>
-          <p className="text-sm font-medium text-brand">Votre espace financier</p>
+          <p className="text-sm font-medium text-brand">Vue d’ensemble</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">
-            {greeting}, {firstName} 👋
+            {greeting}, {user.firstName}
           </h1>
           <p className="mt-3 text-secondary-text">
             Profil {PROFILE_LABELS[data.financialProfile.profileType]} · Santé financière{" "}
@@ -300,9 +304,6 @@ export function DashboardPage({
           <h2 id="quick-actions-title" className="text-lg font-semibold">
             Actions rapides
           </h2>
-          <p className="mt-1 text-sm text-secondary-text">
-            Ces accès seront activés avec les écrans de modification correspondants.
-          </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <ActionLink
               icon={CircleDollarSign}
@@ -319,10 +320,10 @@ export function DashboardPage({
               label={data.goal ? "Ajouter un objectif" : "Créer un objectif"}
               href="/goals/nouveau"
             />
-            <ActionLink
-              icon={UserRound}
-              label="Mettre à jour mon profil"
-              href="/settings/profile"
+            <ProfileActionLink
+              firstName={user.firstName}
+              lastName={user.lastName}
+              image={user.image}
             />
           </div>
         </section>
@@ -336,7 +337,7 @@ export function DashboardPage({
           <NavItem href="/dashboard" label="Accueil" icon={Gauge} active />
           <NavItem href="/goals" label="Objectifs" icon={Target} />
           <NavItem href="/recommendations" label="Conseils" icon={Sparkles} />
-          <NavItem href="/settings/profile" label="Profil" icon={WalletCards} />
+          <ProfileNavItem firstName={user.firstName} lastName={user.lastName} image={user.image} />
           <NavItem href="/settings" label="Réglages" icon={Settings} />
         </div>
       </nav>
@@ -402,6 +403,46 @@ function ActionLink({ icon: Icon, label, href }: { icon: Icon; label: string; hr
     >
       <Icon size={19} aria-hidden="true" />
       <span>{label}</span>
+    </Link>
+  );
+}
+
+function ProfileActionLink({
+  firstName,
+  lastName,
+  image,
+}: {
+  firstName: string;
+  lastName: string;
+  image?: string | null;
+}) {
+  return (
+    <Link
+      href="/settings/profile"
+      className="flex min-h-20 items-center gap-3 rounded-2xl border border-border bg-surface px-4 text-left text-sm text-secondary-text transition hover:border-brand/40 hover:text-foreground"
+    >
+      <Avatar firstName={firstName} lastName={lastName} image={image} size="sm" />
+      <span>Mettre à jour mon profil</span>
+    </Link>
+  );
+}
+
+function ProfileNavItem({
+  firstName,
+  lastName,
+  image,
+}: {
+  firstName: string;
+  lastName: string;
+  image?: string | null;
+}) {
+  return (
+    <Link
+      href="/settings/profile"
+      className="flex min-w-16 flex-col items-center gap-1 rounded-xl px-2 py-1 text-xs text-muted hover:text-foreground"
+    >
+      <Avatar firstName={firstName} lastName={lastName} image={image} size="xs" />
+      <span>Profil</span>
     </Link>
   );
 }

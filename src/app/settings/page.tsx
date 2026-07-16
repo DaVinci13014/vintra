@@ -5,14 +5,13 @@ import {
   LockKeyhole,
   Palette,
   ShieldCheck,
-  UserRound,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { requireSession } from "@/features/auth/server";
 import { getSettingsOverview } from "@/features/settings";
+import { Avatar } from "@/shared/ui";
 import { SettingsLayout } from "@/widgets/settings";
 
 const SECTIONS = [
@@ -20,7 +19,7 @@ const SECTIONS = [
     href: "/settings/profile",
     title: "Mon profil",
     description: "Identité, finances et gestion du compte",
-    icon: UserRound,
+    icon: null,
   },
   {
     href: "/settings/preferences",
@@ -61,23 +60,15 @@ export default async function SettingsPage() {
   if (!data?.profile.onboardingCompleted) redirect("/onboarding");
 
   return (
-    <SettingsLayout>
+    <SettingsLayout user={session.user}>
       <section className="rounded-3xl border border-border bg-surface p-5 sm:p-8">
         <div className="flex items-center gap-4">
-          {data.image ? (
-            <Image
-              src={data.image}
-              alt="Photo de profil"
-              width={64}
-              height={64}
-              unoptimized
-              className="size-16 rounded-2xl object-cover"
-            />
-          ) : (
-            <div className="grid size-16 place-items-center rounded-2xl bg-brand/10 text-xl font-semibold text-brand">
-              {initials(data.firstName, data.lastName)}
-            </div>
-          )}
+          <Avatar
+            firstName={data.firstName}
+            lastName={data.lastName}
+            image={data.image}
+            size="lg"
+          />
           <div className="min-w-0">
             <h1 className="truncate text-2xl font-semibold">
               {data.firstName} {data.lastName}
@@ -94,9 +85,19 @@ export default async function SettingsPage() {
             href={href}
             className="group flex min-h-32 items-start gap-4 rounded-2xl border border-border bg-surface p-5 transition hover:border-brand/40"
           >
-            <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-card text-brand">
-              <Icon size={19} aria-hidden="true" />
-            </div>
+            {Icon ? (
+              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-card text-brand">
+                <Icon size={19} aria-hidden="true" />
+              </div>
+            ) : (
+              <Avatar
+                firstName={data.firstName}
+                lastName={data.lastName}
+                image={data.image}
+                size="sm"
+                className="m-1"
+              />
+            )}
             <div className="min-w-0 flex-1">
               <h2 className="font-semibold">{title}</h2>
               <p className="mt-1 text-sm leading-6 text-secondary-text">{description}</p>
@@ -111,8 +112,4 @@ export default async function SettingsPage() {
       </section>
     </SettingsLayout>
   );
-}
-
-function initials(firstName: string, lastName: string) {
-  return `${firstName.at(0) ?? ""}${lastName.at(0) ?? ""}`.toUpperCase();
 }

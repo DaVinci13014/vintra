@@ -223,7 +223,7 @@ Toutes les couleurs proviennent des Design Tokens.
 
 Couleur principale
 
-Vintra Green
+Vintra White
 
 ---
 
@@ -239,7 +239,8 @@ Border
 
 Text
 
-Aucune couleur supplémentaire ne peut être introduite sans validation.
+La marque est monochrome : blanc, noir et gris. Les couleurs sémantiques restent réservées aux
+erreurs et avertissements.
 
 ---
 

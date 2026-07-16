@@ -80,7 +80,7 @@ Aucune couleur HEX ne doit être utilisée directement dans les composants.
 
 Background
 
-#09090B
+#0A0A0B
 
 ---
 
@@ -98,7 +98,7 @@ Card
 
 Elevated Card
 
-#202024
+#222225
 
 ---
 
@@ -110,41 +110,38 @@ rgba(9,9,11,0.80)
 
 Border
 
-#2A2A2E
+#303034
 
 ---
 
 Divider
 
-#313135
+#3F3F46
 
 ---
 
 # Brand Color
 
-Vintra Green
+Vintra White
 
-#4ADE80
+#FAFAFA
 
 Utilisation
 
 - CTA principal
 - Progression
-- Validation
-- Succès
-- Gains
+- États actifs
+- Mise en évidence des données
 
-Maximum 10 % de l'écran.
-
-Le vert ne doit jamais devenir la couleur dominante.
+La marque reste monochrome. Le blanc ne remplace jamais la hiérarchie typographique.
 
 ---
 
 # Secondary Color
 
-Blue
+Light Gray
 
-#3B82F6
+#D4D4D8
 
 Utilisation
 
@@ -158,7 +155,7 @@ Utilisation
 
 Success
 
-#22C55E
+#E4E4E7
 
 Warning
 
@@ -166,11 +163,11 @@ Warning
 
 Danger
 
-#EF4444
+#F87171
 
 Info
 
-#38BDF8
+#D4D4D8
 
 ---
 
@@ -178,19 +175,19 @@ Info
 
 Primary
 
-#FFFFFF
+#FAFAFA
 
 ---
 
 Secondary
 
-#A1A1AA
+#D4D4D8
 
 ---
 
 Muted
 
-#71717A
+#A1A1AA
 
 ---
 
@@ -202,7 +199,7 @@ Disabled
 
 Inverse
 
-#09090B
+#18181B
 
 ---
 
@@ -804,7 +801,7 @@ Dark Theme
 
 Couleur
 
-Brand Green
+Brand
 
 Épaisseur
 

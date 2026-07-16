@@ -11,7 +11,7 @@ export default async function SettingsSecurityPage() {
   const sessions = await getSecuritySettings(session.user.id, session.session.token);
 
   return (
-    <SettingsLayout active="security">
+    <SettingsLayout active="security" user={session.user}>
       <p className="text-sm font-medium text-brand">Sécurité</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
         Protéger mon compte

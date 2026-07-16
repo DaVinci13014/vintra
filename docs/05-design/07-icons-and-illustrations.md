@@ -422,11 +422,9 @@ Toujours circulaire.
 
 Si aucune image :
 
-Afficher les initiales.
+Afficher les initiales du prénom et du nom dans un cercle contrasté.
 
-Si aucune initiale :
-
-Afficher l'icône User.
+Une icône utilisateur générique ne remplace jamais une photo ou des initiales dans la navigation.
 
 ---
 

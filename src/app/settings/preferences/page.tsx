@@ -12,7 +12,7 @@ export default async function SettingsPreferencesPage() {
   if (!data?.profile.onboardingCompleted) redirect("/onboarding");
 
   return (
-    <SettingsLayout active="preferences">
+    <SettingsLayout active="preferences" user={session.user}>
       <p className="text-sm font-medium text-brand">Préférences</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
         Personnaliser Vintra

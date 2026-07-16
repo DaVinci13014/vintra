@@ -118,7 +118,6 @@ Présenter les informations principales de l'utilisateur.
 - Prénom
 - Message de bienvenue
 - Icône Notifications
-- Icône Paramètres
 
 ---
 
@@ -143,6 +142,8 @@ Avatar
 ↓
 
 Ouvre les paramètres.
+
+L'avatar affiche la photo enregistrée. Sans photo, il affiche les initiales du prénom et du nom.
 
 Notifications
 

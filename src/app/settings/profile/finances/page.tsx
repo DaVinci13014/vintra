@@ -12,7 +12,7 @@ export default async function SettingsFinancialProfilePage() {
   if (!profile) redirect("/onboarding");
 
   return (
-    <SettingsLayout active="profile">
+    <SettingsLayout active="profile" user={session.user}>
       <p className="text-sm font-medium text-brand">Mon profil</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
         Situation financière

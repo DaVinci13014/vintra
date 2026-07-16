@@ -11,5 +11,14 @@ export default async function DashboardRoute() {
   const data = await getDashboardData(session.user.id);
   if (!data.completed) redirect("/onboarding");
 
-  return <DashboardPage data={data} firstName={session.user.firstName} />;
+  return (
+    <DashboardPage
+      data={data}
+      user={{
+        firstName: session.user.firstName,
+        lastName: session.user.lastName,
+        image: session.user.image,
+      }}
+    />
+  );
 }
