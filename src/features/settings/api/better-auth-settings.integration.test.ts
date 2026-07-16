@@ -65,6 +65,24 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
       const refreshedCookie = getSessionCookie(changePasswordResponse);
 
       const user = await prisma.user.findUniqueOrThrow({ where: { email } });
+      expect(
+        await prisma.notification.count({
+          where: {
+            profile: { userId: user.id },
+            type: "SECURITY",
+            title: "Nouvelle connexion",
+          },
+        }),
+      ).toBeGreaterThanOrEqual(2);
+      expect(
+        await prisma.notification.count({
+          where: {
+            profile: { userId: user.id },
+            type: "SECURITY",
+            title: "Mot de passe modifié",
+          },
+        }),
+      ).toBe(1);
       await prisma.supportRequest.create({
         data: {
           userId: user.id,

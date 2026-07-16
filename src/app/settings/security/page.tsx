@@ -8,7 +8,7 @@ import { SettingsLayout } from "@/widgets/settings";
 export default async function SettingsSecurityPage() {
   const session = await requireSession();
   if (!session.user.emailVerified) redirect("/verification-email");
-  const sessions = await getSecuritySettings(session.session.token);
+  const sessions = await getSecuritySettings(session.user.id, session.session.token);
 
   return (
     <SettingsLayout active="security">

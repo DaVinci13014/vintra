@@ -1,6 +1,3 @@
-import { headers } from "next/headers";
-
-import { auth } from "@/features/auth/server";
 import { prisma } from "@/shared/api/database";
 import { currencyPreferenceSchema } from "@/shared/config";
 
@@ -44,8 +41,19 @@ export async function getSettingsOverview(userId: string) {
   };
 }
 
-export async function getSecuritySettings(currentSessionToken: string) {
-  const sessions = await auth.api.listSessions({ headers: await headers() });
+export async function getSecuritySettings(userId: string, currentSessionToken: string) {
+  const sessions = await prisma.session.findMany({
+    where: { userId, expiresAt: { gt: new Date() } },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      token: true,
+      ipAddress: true,
+      userAgent: true,
+      createdAt: true,
+      expiresAt: true,
+    },
+  });
 
   return sessions.map((session) => ({
     id: session.id,

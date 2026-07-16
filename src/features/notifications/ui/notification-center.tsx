@@ -71,26 +71,34 @@ export function NotificationCenter({ data }: { data: NotificationCenterData }) {
     setError(null);
     setMessage(null);
     startTransition(async () => {
-      const response = await action();
-      if (!response.success) {
-        setError(response.error?.message ?? "Cette action n’a pas pu être effectuée.");
-        return;
+      try {
+        const response = await action();
+        if (!response.success) {
+          setError(response.error?.message ?? "Cette action n’a pas pu être effectuée.");
+          return;
+        }
+        setMessage(success);
+        setConfirmClear(false);
+        router.refresh();
+      } catch {
+        setError("La connexion au serveur a été interrompue. Réessayez.");
       }
-      setMessage(success);
-      setConfirmClear(false);
-      router.refresh();
     });
   }
 
   function open(notification: NotificationListItem) {
     setError(null);
     startTransition(async () => {
-      const response = await openNotification(notification.id);
-      if (!response.success) {
-        setError(response.error.message);
-        return;
+      try {
+        const response = await openNotification(notification.id);
+        if (!response.success) {
+          setError(response.error.message);
+          return;
+        }
+        router.push(response.data.destination);
+      } catch {
+        setError("La notification n’a pas pu être ouverte. Réessayez.");
       }
-      router.push(response.data.destination);
     });
   }
 

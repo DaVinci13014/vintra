@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { deliverPendingPushNotifications } from "@/entities/notification/server";
+import { safelyDeliverPendingPushNotifications } from "@/entities/notification/server";
 import { getSession } from "@/features/auth/server";
 import type { ApiResponse } from "@/shared/api";
 import { prisma } from "@/shared/api/database";
@@ -35,8 +35,9 @@ export async function openNotification(
   const id = notificationIdSchema.safeParse(input);
   if (!id.success) return failure("VALIDATION_ERROR", "Cette notification n’est pas valide.");
 
+  let destination: string | null;
   try {
-    const destination = await prisma.$transaction(async (transaction) => {
+    destination = await prisma.$transaction(async (transaction) => {
       const notification = await transaction.notification.findFirst({
         where: {
           id: id.data,
@@ -45,7 +46,7 @@ export async function openNotification(
         },
         select: { status: true, actionUrl: true },
       });
-      if (!notification) throw new Error("NOTIFICATION_NOT_FOUND");
+      if (!notification) return null;
 
       if (notification.status === "UNREAD") {
         await transaction.notification.update({
@@ -64,11 +65,14 @@ export async function openNotification(
       });
       return notification.actionUrl?.startsWith("/") ? notification.actionUrl : "/notifications";
     });
-    refresh();
-    return { success: true, data: { destination } };
   } catch {
+    return failure("NOTIFICATION_UPDATE_FAILED", "La notification n’a pas pu être ouverte.");
+  }
+  if (!destination) {
     return failure("NOTIFICATION_NOT_FOUND", "Cette notification n’existe pas.");
   }
+  refresh();
+  return { success: true, data: { destination } };
 }
 
 export async function markNotificationRead(input: unknown): Promise<ApiResponse<{ read: true }>> {
@@ -77,25 +81,34 @@ export async function markNotificationRead(input: unknown): Promise<ApiResponse<
   const id = notificationIdSchema.safeParse(input);
   if (!id.success) return failure("VALIDATION_ERROR", "Cette notification n’est pas valide.");
 
-  const result = await prisma.notification.updateMany({
-    where: {
-      id: id.data,
-      profile: { userId: context.data.userId },
-      status: "UNREAD",
-    },
-    data: { status: "READ", readAt: new Date() },
-  });
-  if (result.count === 0) {
-    const owned = await prisma.notification.findFirst({
-      where: { id: id.data, profile: { userId: context.data.userId }, status: "READ" },
-      select: { id: true },
+  let found: boolean;
+  try {
+    found = await prisma.$transaction(async (transaction) => {
+      const result = await transaction.notification.updateMany({
+        where: {
+          id: id.data,
+          profile: { userId: context.data.userId },
+          status: "UNREAD",
+        },
+        data: { status: "READ", readAt: new Date() },
+      });
+      if (result.count > 0) {
+        await transaction.auditLog.create({
+          data: { userId: context.data.userId, action: "NOTIFICATION_READ" },
+        });
+        return true;
+      }
+      return Boolean(
+        await transaction.notification.findFirst({
+          where: { id: id.data, profile: { userId: context.data.userId }, status: "READ" },
+          select: { id: true },
+        }),
+      );
     });
-    if (!owned) return failure("NOTIFICATION_NOT_FOUND", "Cette notification n’existe pas.");
-  } else {
-    await prisma.auditLog.create({
-      data: { userId: context.data.userId, action: "NOTIFICATION_READ" },
-    });
+  } catch {
+    return failure("NOTIFICATION_UPDATE_FAILED", "La notification n’a pas pu être mise à jour.");
   }
+  if (!found) return failure("NOTIFICATION_NOT_FOUND", "Cette notification n’existe pas.");
   refresh();
   return { success: true, data: { read: true } };
 }
@@ -104,17 +117,28 @@ export async function markAllNotificationsRead(): Promise<ApiResponse<{ count: n
   const context = await getContext();
   if (!context.success) return context;
 
-  const result = await prisma.notification.updateMany({
-    where: { profile: { userId: context.data.userId }, status: "UNREAD" },
-    data: { status: "READ", readAt: new Date() },
-  });
-  if (result.count > 0) {
-    await prisma.auditLog.create({
-      data: { userId: context.data.userId, action: "NOTIFICATION_READ" },
+  let count: number;
+  try {
+    count = await prisma.$transaction(async (transaction) => {
+      const result = await transaction.notification.updateMany({
+        where: { profile: { userId: context.data.userId }, status: "UNREAD" },
+        data: { status: "READ", readAt: new Date() },
+      });
+      if (result.count > 0) {
+        await transaction.auditLog.create({
+          data: { userId: context.data.userId, action: "NOTIFICATION_READ" },
+        });
+      }
+      return result.count;
     });
+  } catch {
+    return failure(
+      "NOTIFICATION_UPDATE_FAILED",
+      "Les notifications n’ont pas pu être mises à jour.",
+    );
   }
   refresh();
-  return { success: true, data: { count: result.count } };
+  return { success: true, data: { count } };
 }
 
 export async function deleteNotification(input: unknown): Promise<ApiResponse<{ deleted: true }>> {
@@ -123,15 +147,24 @@ export async function deleteNotification(input: unknown): Promise<ApiResponse<{ 
   const id = notificationIdSchema.safeParse(input);
   if (!id.success) return failure("VALIDATION_ERROR", "Cette notification n’est pas valide.");
 
-  const result = await prisma.notification.deleteMany({
-    where: { id: id.data, profile: { userId: context.data.userId } },
-  });
-  if (result.count === 0) {
+  let deleted: boolean;
+  try {
+    deleted = await prisma.$transaction(async (transaction) => {
+      const result = await transaction.notification.deleteMany({
+        where: { id: id.data, profile: { userId: context.data.userId } },
+      });
+      if (result.count === 0) return false;
+      await transaction.auditLog.create({
+        data: { userId: context.data.userId, action: "NOTIFICATION_DELETED" },
+      });
+      return true;
+    });
+  } catch {
+    return failure("NOTIFICATION_DELETE_FAILED", "La notification n’a pas pu être supprimée.");
+  }
+  if (!deleted) {
     return failure("NOTIFICATION_NOT_FOUND", "Cette notification n’existe pas.");
   }
-  await prisma.auditLog.create({
-    data: { userId: context.data.userId, action: "NOTIFICATION_DELETED" },
-  });
   refresh();
   return { success: true, data: { deleted: true } };
 }
@@ -140,16 +173,24 @@ export async function deleteAllNotifications(): Promise<ApiResponse<{ count: num
   const context = await getContext();
   if (!context.success) return context;
 
-  const result = await prisma.notification.deleteMany({
-    where: { profile: { userId: context.data.userId } },
-  });
-  if (result.count > 0) {
-    await prisma.auditLog.create({
-      data: { userId: context.data.userId, action: "NOTIFICATION_DELETED" },
+  let count: number;
+  try {
+    count = await prisma.$transaction(async (transaction) => {
+      const result = await transaction.notification.deleteMany({
+        where: { profile: { userId: context.data.userId } },
+      });
+      if (result.count > 0) {
+        await transaction.auditLog.create({
+          data: { userId: context.data.userId, action: "NOTIFICATION_DELETED" },
+        });
+      }
+      return result.count;
     });
+  } catch {
+    return failure("NOTIFICATION_DELETE_FAILED", "Les notifications n’ont pas pu être supprimées.");
   }
   refresh();
-  return { success: true, data: { count: result.count } };
+  return { success: true, data: { count } };
 }
 
 export async function updateNotificationPreferences(
@@ -181,6 +222,7 @@ export async function updateNotificationPreferences(
       "Les préférences n’ont pas pu être enregistrées.",
     );
   }
+  await safelyDeliverPendingPushNotifications(context.data.userId);
   refresh();
   return { success: true, data: parsed.data };
 }
@@ -237,7 +279,7 @@ export async function enablePushNotifications(
     return failure("PUSH_ENABLE_FAILED", "Les notifications Push n’ont pas pu être activées.");
   }
 
-  await deliverPendingPushNotifications(context.data.userId);
+  await safelyDeliverPendingPushNotifications(context.data.userId);
   refresh();
   return { success: true, data: { enabled: true } };
 }

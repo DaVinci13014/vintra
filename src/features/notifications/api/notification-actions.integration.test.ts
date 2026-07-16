@@ -164,7 +164,7 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")("notifications avec Po
     expect(preferences.success).toBe(true);
 
     const enabled = await enablePushNotifications({
-      endpoint: `https://push.example.test/${randomUUID()}`,
+      endpoint: `https://fcm.googleapis.com/fcm/send/${randomUUID()}`,
       expirationTime: null,
       keys: {
         p256dh: "A".repeat(88),

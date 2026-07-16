@@ -57,13 +57,18 @@ export function NotificationPreferences({ initialValues }: { initialValues: Init
     setError(null);
     setMessage(null);
     startTransition(async () => {
-      const response = await updateNotificationPreferences(parsed.data);
-      if (!response.success) {
+      try {
+        const response = await updateNotificationPreferences(parsed.data);
+        if (!response.success) {
+          setValues(previous);
+          setError(response.error.message);
+          return;
+        }
+        setMessage("Préférences enregistrées.");
+      } catch {
         setValues(previous);
-        setError(response.error.message);
-        return;
+        setError("La connexion au serveur a été interrompue. Réessayez.");
       }
-      setMessage("Préférences enregistrées.");
     });
   }
 
@@ -111,7 +116,13 @@ export function NotificationPreferences({ initialValues }: { initialValues: Init
     setError(null);
     setMessage(null);
     startTransition(async () => {
-      const response = await disablePushNotifications();
+      let response: Awaited<ReturnType<typeof disablePushNotifications>>;
+      try {
+        response = await disablePushNotifications();
+      } catch {
+        setError("La connexion au serveur a été interrompue. Réessayez.");
+        return;
+      }
       if (!response.success) {
         setError(response.error.message);
         return;
@@ -121,7 +132,7 @@ export function NotificationPreferences({ initialValues }: { initialValues: Init
         const subscription = await registration?.pushManager.getSubscription();
         await subscription?.unsubscribe();
       } catch {
-        // L’abonnement serveur est déjà supprimé ; le navigateur expirera la souscription locale.
+        // Le serveur est déjà désabonné ; la souscription locale expirera sans nouvel envoi.
       }
       setPushEnabled(false);
       setMessage("Notifications Push désactivées.");

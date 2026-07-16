@@ -5,20 +5,9 @@ import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 const userId = randomUUID();
-type MockSession = {
-  id: string;
-  token: string;
-  userId: string;
-  ipAddress: string | null;
-  userAgent: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  expiresAt: Date;
-};
 const mocks = vi.hoisted(() => ({
   changePassword: vi.fn(async () => ({ token: null })),
   deleteUser: vi.fn(async () => ({ success: true })),
-  listSessions: vi.fn(async (): Promise<MockSession[]> => []),
   revokeOtherSessions: vi.fn(async () => ({ status: true })),
   revokeSessions: vi.fn(async () => ({ status: true })),
   cookieSet: vi.fn(),
@@ -33,7 +22,6 @@ vi.mock("@/features/auth/server", () => ({
     api: {
       changePassword: mocks.changePassword,
       deleteUser: mocks.deleteUser,
-      listSessions: mocks.listSessions,
       revokeOtherSessions: mocks.revokeOtherSessions,
       revokeSessions: mocks.revokeSessions,
     },
@@ -197,11 +185,6 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")("paramètres avec Post
     expect((await revokeOtherSessions()).success).toBe(true);
     expect((await revokeAllSessions()).success).toBe(true);
     expect(mocks.changePassword).toHaveBeenCalledOnce();
-    expect(
-      await prisma.notification.count({
-        where: { profile: { userId }, type: "SECURITY", title: "Mot de passe modifié" },
-      }),
-    ).toBe(1);
     expect(mocks.revokeOtherSessions).toHaveBeenCalledOnce();
     expect(mocks.revokeSessions).toHaveBeenCalledOnce();
 
@@ -215,21 +198,16 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")("paramètres avec Post
   });
 
   it("retourne la vue du compte et masque les détails réseau des sessions", async () => {
-    mocks.listSessions.mockResolvedValueOnce([
-      {
-        id: randomUUID(),
-        token: "current-token",
-        userId,
+    await prisma.session.updateMany({
+      where: { userId },
+      data: {
         ipAddress: "192.168.1.10",
         userAgent: "Mozilla/5.0 (Mac OS) Chrome/140",
-        createdAt: new Date("2026-01-01"),
-        updatedAt: new Date("2026-01-01"),
-        expiresAt: new Date("2026-12-31"),
       },
-    ]);
+    });
 
     const overview = await getSettingsOverview(userId);
-    const sessions = await getSecuritySettings("current-token");
+    const sessions = await getSecuritySettings(userId, `private-token-${userId}`);
     expect(overview?.profile.currency).toBe("CHF");
     expect(sessions[0]).toMatchObject({
       current: true,

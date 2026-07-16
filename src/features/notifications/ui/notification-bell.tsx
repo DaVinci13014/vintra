@@ -17,8 +17,12 @@ export function NotificationBell({ initialCount }: { initialCount: number }) {
 
     async function refreshCount() {
       if (document.visibilityState !== "visible") return;
-      const response = await getUnreadNotificationCount();
-      if (active && response.success) setCount(response.data.count);
+      try {
+        const response = await getUnreadNotificationCount();
+        if (active && response.success) setCount(response.data.count);
+      } catch {
+        return;
+      }
     }
 
     const interval = window.setInterval(refreshCount, POLL_INTERVAL);

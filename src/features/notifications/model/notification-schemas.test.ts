@@ -48,4 +48,23 @@ describe("schémas des notifications", () => {
       }).success,
     ).toBe(false);
   });
+
+  it("refuse les endpoints Push non approuvés et accepte un fournisseur navigateur", () => {
+    const subscription = {
+      expirationTime: null,
+      keys: { p256dh: "A".repeat(88), auth: "B".repeat(24) },
+    };
+    expect(
+      pushSubscriptionSchema.safeParse({
+        ...subscription,
+        endpoint: "https://127.0.0.1/internal",
+      }).success,
+    ).toBe(false);
+    expect(
+      pushSubscriptionSchema.safeParse({
+        ...subscription,
+        endpoint: "https://fcm.googleapis.com/fcm/send/test-subscription",
+      }).success,
+    ).toBe(true);
+  });
 });

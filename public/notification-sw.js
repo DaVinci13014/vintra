@@ -19,7 +19,6 @@ self.addEventListener("push", (event) => {
       body,
       tag,
       data: { url },
-      badge: "/logo/vintra-logo.svg",
     }),
   );
 });
@@ -35,8 +34,9 @@ self.addEventListener("notificationclick", (event) => {
         (client) => new URL(client.url).origin === self.location.origin,
       );
       if (matchingClient) {
-        matchingClient.navigate(destination);
-        return matchingClient.focus();
+        return matchingClient
+          .navigate(destination)
+          .then((navigatedClient) => navigatedClient?.focus());
       }
       return self.clients.openWindow(destination);
     }),

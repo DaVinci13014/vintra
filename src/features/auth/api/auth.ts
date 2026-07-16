@@ -55,6 +55,22 @@ export const auth = betterAuth({
         },
       },
     },
+    account: {
+      update: {
+        after: async (account) => {
+          if (account.providerId !== "credential") return;
+          try {
+            await createSecurityNotificationForUser({
+              userId: account.userId,
+              title: "Mot de passe modifié",
+              description: "Votre mot de passe Vintra vient d’être modifié.",
+            });
+          } catch {
+            return;
+          }
+        },
+      },
+    },
     session: {
       create: {
         after: async (session) => {
