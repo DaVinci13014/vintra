@@ -1,1 +1,5 @@
-export { calculateGoalPlan, type GoalPlanInput } from "./lib/calculate-goal-plan";
+export {
+  calculateGoalPlan,
+  calculateGoalProgress,
+  type GoalPlanInput,
+} from "./lib/calculate-goal-plan";

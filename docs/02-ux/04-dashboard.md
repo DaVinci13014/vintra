@@ -68,7 +68,7 @@ Navigation
 
 # Dashboard Structure
 
-Le Dashboard est composé de 7 sections principales.
+Le Dashboard est composé de 8 sections principales.
 
 ```
 Header
@@ -80,6 +80,10 @@ Financial Summary
 ↓
 
 Current Goal
+
+↓
+
+Planned Goals
 
 ↓
 
@@ -253,6 +257,30 @@ Calcul
 Voir le détail
 
 Modifier l'objectif
+
+---
+
+# DASHBOARD_003B — Planned Goals
+
+## Purpose
+
+Donner une vue synthétique des autres projets enregistrés sans les confondre avec l'objectif
+principal.
+
+## Informations
+
+- Nom
+- Montant cible
+- Épargne actuelle de référence
+- Progression estimée
+- Date cible
+
+## Business Rules
+
+- Afficher au maximum les 3 objectifs planifiés les plus récents.
+- Un objectif planifié ne possède pas de Saving Plan actif.
+- L'accès au détail permet de le définir comme nouvel objectif principal.
+- La promotion planifie automatiquement l'ancien objectif principal et recalcule le Dashboard.
 
 ---
 

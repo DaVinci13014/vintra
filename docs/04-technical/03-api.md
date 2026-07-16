@@ -375,6 +375,9 @@ ApiResponse<Dashboard>
 
 ## createGoal()
 
+Crée l'objectif comme `ACTIVE` lorsqu'aucun objectif principal n'existe. Sinon, le nouvel objectif
+est créé comme `PLANNED` sans remplacer le plan actif.
+
 Input
 
 ```ts
@@ -392,6 +395,23 @@ Output
 ```ts
 ApiResponse<Goal>
 ```
+
+---
+
+## setPrimaryGoal()
+
+Input
+
+Goal ID au statut `PLANNED`.
+
+Output
+
+```ts
+ApiResponse<{ id: string }>
+```
+
+L'action planifie l'ancien objectif actif, annule son Saving Plan, recalcule le nouvel objectif et
+crée son Saving Plan dans une transaction sérialisable.
 
 ---
 

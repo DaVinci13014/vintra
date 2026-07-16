@@ -161,6 +161,7 @@ export async function runInitialAnalysis(userId: string) {
     await transaction.savingPlan.create({
       data: {
         profileId: profile.id,
+        goalId: goal.id,
         recommendedMonthlySaving: analysis.recommendedMonthlySaving,
         estimatedCompletionDate: analysis.estimatedCompletionDate,
         difficulty: analysis.difficulty,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateGoalPlan } from "./calculate-goal-plan";
+import { calculateGoalPlan, calculateGoalProgress } from "./calculate-goal-plan";
 
 describe("calculateGoalPlan", () => {
   it("calcule un plan réaliste et sa progression", () => {
@@ -29,5 +29,10 @@ describe("calculateGoalPlan", () => {
     });
     expect(result.status).toBe("COMPLETED");
     expect(result.progress).toBe(100);
+  });
+
+  it("calcule la progression d’un objectif planifié sans dépasser 100 %", () => {
+    expect(calculateGoalProgress(750, 1_000)).toBe(75);
+    expect(calculateGoalProgress(1_250, 1_000)).toBe(100);
   });
 });

@@ -136,7 +136,7 @@ Une version Premium pourra proposer des fonctionnalités avancées.
 Exemples :
 
 - analyses plus détaillées ;
-- objectifs multiples ;
+- objectifs actifs simultanés et allocation avancée entre objectifs ;
 - statistiques avancées ;
 - accompagnement personnalisé ;
 - IA conversationnelle.

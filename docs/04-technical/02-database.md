@@ -243,6 +243,17 @@ goals
 
 1 → N
 
+Statuts
+
+- `PLANNED` : projet secondaire, sans plan actif
+- `ACTIVE` : objectif principal
+- `COMPLETED` : objectif atteint
+- `ARCHIVED` : objectif conservé dans l'historique
+
+Contrainte
+
+- index unique partiel garantissant un seul objectif `ACTIVE` par profil
+
 ---
 
 # Table : saving_plans
@@ -259,6 +270,7 @@ Columns
 |-------|------|
 | id | uuid |
 | profile_id | uuid |
+| goal_id | uuid |
 | recommended_monthly_saving | numeric |
 | estimated_completion_date | date |
 | difficulty | text |
@@ -266,6 +278,21 @@ Columns
 | status | text |
 | created_at | timestamptz |
 | updated_at | timestamptz |
+
+Relations
+
+goals
+
+↓
+
+saving_plans
+
+1 → N
+
+Contraintes
+
+- `goal_id` obligatoire avec suppression en cascade
+- index unique partiel garantissant un seul Saving Plan `ACTIVE` par profil
 
 ---
 

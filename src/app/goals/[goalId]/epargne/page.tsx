@@ -10,7 +10,7 @@ export default async function GoalSavingsPage({ params }: { params: Promise<{ go
   const session = await requireSession();
   const { goalId } = await params;
   const goal = await getGoalSavings(session.user.id, goalId);
-  if (!goal || goal.status === "ARCHIVED") notFound();
+  if (!goal || (goal.status !== "ACTIVE" && goal.status !== "COMPLETED")) notFound();
 
   const money = new Intl.NumberFormat("fr-FR", {
     style: "currency",

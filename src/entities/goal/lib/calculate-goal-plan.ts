@@ -9,7 +9,7 @@ export type GoalPlanInput = {
 };
 
 export function calculateGoalPlan(input: GoalPlanInput, now = new Date()) {
-  const progress = Math.min(100, percentage(input.currentAmount, input.targetAmount));
+  const progress = calculateGoalProgress(input.currentAmount, input.targetAmount);
   const remainingAmount = money(Math.max(0, input.targetAmount - input.currentAmount));
   const ratio = { SAVER: 0.9, BALANCED: 0.8, SPENDER: 0.6, FRAGILE: 0.3 }[input.profileType];
   const recommendedMonthlySaving = money(Math.max(0, input.savingCapacity * ratio));
@@ -36,6 +36,10 @@ export function calculateGoalPlan(input: GoalPlanInput, now = new Date()) {
       reached: progress >= threshold,
     })),
   };
+}
+
+export function calculateGoalProgress(currentAmount: number, targetAmount: number) {
+  return Math.min(100, percentage(currentAmount, targetAmount));
 }
 
 function getDifficulty(

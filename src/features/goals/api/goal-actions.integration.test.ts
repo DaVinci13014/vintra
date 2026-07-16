@@ -11,12 +11,14 @@ vi.mock("@/features/auth/server", () => ({
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
 import { runInitialAnalysis } from "@/features/financial-analysis";
+import { getDashboardData } from "@/features/dashboard";
 import { prisma } from "@/shared/api/database";
 import {
   addSavingsContribution,
   archiveGoal,
   createGoal,
   deleteGoal,
+  setPrimaryGoal,
   updateGoal,
 } from "./goal-actions";
 
@@ -75,7 +77,10 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
       await prisma.$disconnect();
     });
 
-    it("crée, modifie, archive et supprime sans laisser plusieurs objectifs actifs", async () => {
+    it("planifie plusieurs objectifs et ne conserve qu’un objectif principal actif", async () => {
+      const initialGoal = await prisma.goal.findFirstOrThrow({
+        where: { profile: { userId }, status: "ACTIVE" },
+      });
       const created = await createGoal({
         title: "Voyage",
         description: "Projet test",
@@ -85,6 +90,35 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
       expect(created.success).toBe(true);
       if (!created.success) return;
       expect(await prisma.goal.count({ where: { profile: { userId }, status: "ACTIVE" } })).toBe(1);
+      expect(await prisma.goal.count({ where: { profile: { userId }, status: "PLANNED" } })).toBe(
+        1,
+      );
+      expect(await prisma.savingPlan.count({ where: { goalId: created.data.id } })).toBe(0);
+      const dashboardWithPlannedGoal = await getDashboardData(userId);
+      expect(dashboardWithPlannedGoal.completed).toBe(true);
+      if (!dashboardWithPlannedGoal.completed) return;
+      expect(
+        dashboardWithPlannedGoal.plannedGoals.some((goal) => goal.id === created.data.id),
+      ).toBe(true);
+
+      const promoted = await setPrimaryGoal(created.data.id);
+      expect(promoted.success).toBe(true);
+      expect(await prisma.goal.count({ where: { profile: { userId }, status: "ACTIVE" } })).toBe(1);
+      expect((await prisma.goal.findUniqueOrThrow({ where: { id: initialGoal.id } })).status).toBe(
+        "PLANNED",
+      );
+      expect(
+        await prisma.savingPlan.count({
+          where: { goalId: created.data.id, status: "ACTIVE" },
+        }),
+      ).toBe(1);
+      const dashboardWithPromotedGoal = await getDashboardData(userId);
+      expect(dashboardWithPromotedGoal.completed).toBe(true);
+      if (!dashboardWithPromotedGoal.completed) return;
+      expect(dashboardWithPromotedGoal.goal?.id).toBe(created.data.id);
+      expect(
+        dashboardWithPromotedGoal.plannedGoals.some((goal) => goal.id === initialGoal.id),
+      ).toBe(true);
 
       const updated = await updateGoal({
         id: created.data.id,
@@ -141,6 +175,11 @@ describe.runIf(process.env.RUN_DATABASE_TESTS === "true")(
       ]);
       expect(contributionState.savingsSnapshots.at(-1)?.amount.toNumber()).toBe(6_000);
       expect(contributionState.savingPlans).toHaveLength(1);
+      const synchronizedPlannedGoal = await prisma.goal.findUniqueOrThrow({
+        where: { id: initialGoal.id },
+      });
+      expect(synchronizedPlannedGoal.currentAmount.toNumber()).toBe(6_000);
+      expect(synchronizedPlannedGoal.progress.toNumber()).toBe(75);
       expect(
         await prisma.notification.count({
           where: { profile: { userId }, dedupeKey: `goal:${created.data.id}:completed` },

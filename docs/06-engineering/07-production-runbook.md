@@ -134,7 +134,7 @@ La Pull Request doit être verte. Sur l’URL d’aperçu, valider dans cet ordr
 2. inscription, connexion, confirmation email et mot de passe oublié ;
 3. onboarding complet ;
 4. dashboard et profil financier ;
-5. création, modification et progression d’un objectif ;
+5. création d'un objectif planifié, promotion en objectif principal, modification et progression ;
 6. recommandations ;
 7. paramètres, export et suppression de compte ;
 8. notifications et activation Web Push ;

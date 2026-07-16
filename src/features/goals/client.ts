@@ -3,6 +3,7 @@ export {
   archiveGoal,
   createGoal,
   deleteGoal,
+  setPrimaryGoal,
   updateGoal,
 } from "./api/goal-actions";
 export {

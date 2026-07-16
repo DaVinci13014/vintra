@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { calculateFinancialAnalysis, type AnalysisInput } from "@/entities/financial-profile";
-import { calculateGoalPlan } from "@/entities/goal";
+import { calculateGoalPlan, calculateGoalProgress } from "@/entities/goal";
 import { generateRecommendations } from "@/entities/recommendation";
 import {
   createGoalProgressNotifications,
@@ -122,7 +122,7 @@ export async function updateFinancialProfile(
           },
         });
         const activePlan = await transaction.savingPlan.findFirst({
-          where: { profileId: profile.id, status: "ACTIVE" },
+          where: { goalId: goal.id, status: "ACTIVE" },
           orderBy: { createdAt: "desc" },
         });
         const planData = {
@@ -135,7 +135,10 @@ export async function updateFinancialProfile(
         };
         if (activePlan)
           await transaction.savingPlan.update({ where: { id: activePlan.id }, data: planData });
-        else await transaction.savingPlan.create({ data: { profileId: profile.id, ...planData } });
+        else
+          await transaction.savingPlan.create({
+            data: { profileId: profile.id, goalId: goal.id, ...planData },
+          });
         await createGoalProgressNotifications(transaction, {
           profileId: profile.id,
           goalId: goal.id,
@@ -145,6 +148,24 @@ export async function updateFinancialProfile(
           completed: plan.status === "COMPLETED",
         });
       }
+      const plannedGoals = await transaction.goal.findMany({
+        where: { profileId: profile.id, status: "PLANNED" },
+        select: { id: true, targetAmount: true },
+      });
+      await Promise.all(
+        plannedGoals.map((plannedGoal) =>
+          transaction.goal.update({
+            where: { id: plannedGoal.id },
+            data: {
+              currentAmount: parsed.data.currentSavings,
+              progress: calculateGoalProgress(
+                parsed.data.currentSavings,
+                plannedGoal.targetAmount.toNumber(),
+              ),
+            },
+          }),
+        ),
+      );
       await transaction.auditLog.create({
         data: { userId: session.user.id, action: "PROFILE_UPDATED" },
       });

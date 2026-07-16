@@ -19,7 +19,8 @@ Contrairement à un simple objectif d'épargne, le Saving Plan indique précisé
 - quel sera le résultat attendu ;
 - comment adapter le plan lorsque la situation financière évolue.
 
-Chaque utilisateur possède un seul Saving Plan actif.
+Chaque utilisateur possède un seul Saving Plan actif, rattaché à son objectif principal.
+Les objectifs planifiés peuvent afficher une simulation, mais ne créent aucun Saving Plan actif.
 
 ---
 
@@ -292,6 +293,8 @@ Plan abandonné.
 
 Un seul Saving Plan actif par utilisateur.
 
+Chaque Saving Plan référence explicitement le Goal qui l'a généré.
+
 ---
 
 ## BR-002
@@ -445,6 +448,9 @@ milestone_reached
 ✓ Les données sont synchronisées avec le Dashboard.
 
 ✓ Le plan reste cohérent après chaque modification du profil.
+
+✓ Le changement d'objectif principal annule l'ancien plan actif et génère le plan du nouvel
+objectif dans une seule transaction.
 
 ---
 

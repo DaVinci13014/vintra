@@ -24,9 +24,8 @@ export async function getDashboardData(userId: string) {
         },
       },
       goals: {
-        where: { status: { in: ["ACTIVE", "COMPLETED"] } },
+        where: { status: { in: ["PLANNED", "ACTIVE", "COMPLETED"] } },
         orderBy: { createdAt: "desc" },
-        take: 1,
         select: {
           id: true,
           title: true,
@@ -35,17 +34,17 @@ export async function getDashboardData(userId: string) {
           targetDate: true,
           progress: true,
           status: true,
-        },
-      },
-      savingPlans: {
-        where: { status: { in: ["ACTIVE", "COMPLETED"] } },
-        orderBy: { createdAt: "desc" },
-        take: 1,
-        select: {
-          recommendedMonthlySaving: true,
-          estimatedCompletionDate: true,
-          difficulty: true,
-          progress: true,
+          savingPlans: {
+            where: { status: { in: ["ACTIVE", "COMPLETED"] } },
+            orderBy: { createdAt: "desc" },
+            take: 1,
+            select: {
+              recommendedMonthlySaving: true,
+              estimatedCompletionDate: true,
+              difficulty: true,
+              progress: true,
+            },
+          },
         },
       },
       recommendations: {
@@ -75,8 +74,13 @@ export async function getDashboardData(userId: string) {
   if (!profile.onboardingCompleted) return { completed: false as const };
 
   const financialProfile = profile.financialProfiles[0];
-  const goal = profile.goals[0];
-  const savingPlan = profile.savingPlans[0];
+  const goal =
+    profile.goals.find((candidate) => candidate.status === "ACTIVE") ??
+    profile.goals.find((candidate) => candidate.status === "COMPLETED");
+  const savingPlan = goal?.savingPlans[0];
+  const plannedGoals = profile.goals
+    .filter((candidate) => candidate.status === "PLANNED")
+    .slice(0, 3);
   if (!financialProfile) throw new Error("DASHBOARD_DATA_INCOMPLETE");
 
   const impactWeight = { VERY_HIGH: 5, HIGH: 4, MEDIUM: 3, LOW: 2, VERY_LOW: 1 } as const;
@@ -123,10 +127,13 @@ export async function getDashboardData(userId: string) {
     },
     goal: goal
       ? {
-          ...goal,
+          id: goal.id,
+          title: goal.title,
           targetAmount: goal.targetAmount.toNumber(),
           currentAmount: goal.currentAmount.toNumber(),
+          targetDate: goal.targetDate,
           progress: goal.progress.toNumber(),
+          status: goal.status,
         }
       : null,
     savingPlan: savingPlan
@@ -136,6 +143,15 @@ export async function getDashboardData(userId: string) {
           progress: savingPlan.progress.toNumber(),
         }
       : null,
+    plannedGoals: plannedGoals.map((plannedGoal) => ({
+      id: plannedGoal.id,
+      title: plannedGoal.title,
+      targetAmount: plannedGoal.targetAmount.toNumber(),
+      currentAmount: plannedGoal.currentAmount.toNumber(),
+      targetDate: plannedGoal.targetDate,
+      progress: plannedGoal.progress.toNumber(),
+      status: plannedGoal.status,
+    })),
     recommendations,
     unreadNotificationCount: profile._count.notifications,
     savingsHistory: profile.savingsSnapshots

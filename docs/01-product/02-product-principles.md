@@ -203,9 +203,12 @@ Vintra doit toujours commencer par les recommandations offrant le meilleur rappo
 
 ## Principe 17 — Toujours travailler vers un objectif
 
-L'utilisateur doit toujours avoir un objectif actif.
+L'utilisateur doit toujours avoir au plus un objectif principal actif.
 
 Cet objectif guide toute l'expérience.
+
+L'utilisateur peut préparer d'autres objectifs. Ces projets restent planifiés tant qu'ils ne sont
+pas choisis comme objectif principal et ne créent pas de plan d'épargne actif supplémentaire.
 
 ---
 

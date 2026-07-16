@@ -10,7 +10,10 @@ Status : Approved
 
 Le système d'objectifs permet à chaque utilisateur de définir une cible d'épargne concrète.
 
-Toutes les analyses de Vintra sont construites autour de cet objectif.
+Toutes les analyses de Vintra sont construites autour de l'objectif principal.
+
+L'utilisateur peut également enregistrer plusieurs objectifs planifiés afin de préparer ses
+prochains projets. Un seul objectif reste principal à un instant donné.
 
 Un objectif représente une destination financière.
 
@@ -31,6 +34,8 @@ Exemples :
 Ce document couvre :
 
 - Création d'objectif
+- Planification d'objectifs supplémentaires
+- Changement d'objectif principal
 - Consultation
 - Modification
 - Suppression
@@ -56,6 +61,10 @@ Créer
 
 ↓
 
+Planifié (si un objectif principal existe déjà)
+
+↓
+
 Actif
 
 ↓
@@ -77,7 +86,7 @@ Archivé
 
 ## Purpose
 
-Créer le premier objectif financier.
+Créer un objectif financier principal ou supplémentaire.
 
 ---
 
@@ -149,6 +158,26 @@ Maximum
 # Business Rules
 
 Un seul objectif principal est actif.
+
+Si un objectif actif existe déjà, le nouvel objectif reçoit le statut `PLANNED`. Il utilise
+l'épargne actuelle comme référence de projection, mais ne crée pas de Saving Plan actif.
+
+---
+
+# GOAL_001B — Set Primary Goal
+
+## Purpose
+
+Choisir un objectif planifié comme nouvelle priorité.
+
+## Result
+
+- L'ancien objectif actif devient `PLANNED`.
+- Son Saving Plan actif devient `CANCELLED`.
+- Le nouvel objectif est recalculé avec l'épargne et le profil financier actuels.
+- Un Saving Plan lié au nouvel objectif est créé.
+- Le Dashboard, les projections et les recommandations continuent de suivre un seul objectif
+  principal.
 
 ---
 
@@ -278,6 +307,13 @@ Annuler
 
 # Goal States
 
+PLANNED
+
+Objectif enregistré pour plus tard. Sa progression est une projection fondée sur l'épargne
+actuelle et aucun Saving Plan actif ne lui est associé.
+
+---
+
 ACTIVE
 
 Objectif en cours.
@@ -352,7 +388,7 @@ Créez votre premier objectif.
 
 ## BR-001
 
-Un seul objectif principal actif.
+Un seul objectif principal actif. Plusieurs objectifs `PLANNED` sont autorisés.
 
 ---
 
@@ -377,6 +413,20 @@ Toute modification déclenche un recalcul.
 ## BR-005
 
 Un objectif terminé est automatiquement marqué comme Completed.
+
+---
+
+## BR-006
+
+Définir un objectif planifié comme principal planifie l'ancien objectif actif et ne laisse jamais
+plus d'un Goal ou d'un Saving Plan au statut `ACTIVE`.
+
+---
+
+## BR-007
+
+Les variations de l'épargne actuelle recalculent la progression affichée pour tous les objectifs
+planifiés.
 
 ---
 

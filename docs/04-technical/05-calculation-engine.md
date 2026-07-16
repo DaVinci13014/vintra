@@ -265,6 +265,9 @@ Progression maximale :
 
 100 %
 
+Pour un objectif `PLANNED`, cette progression est une projection recalculée à partir de l'épargne
+actuelle. Elle ne réserve pas cette somme et ne génère pas de Saving Plan actif.
+
 ---
 
 # Budget Score

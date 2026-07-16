@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { requireSession } from "@/features/auth/server";
 import { getGoal } from "@/features/goals";
-import { GoalActions } from "@/features/goals/ui";
+import { GoalActions, GoalPrimaryAction } from "@/features/goals/ui";
 import { GoalsLayout } from "@/widgets/goals";
 
 export default async function GoalDetailPage({ params }: { params: Promise<{ goalId: string }> }) {
@@ -22,7 +22,7 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ goa
     <GoalsLayout backHref="/goals">
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
         <div>
-          <p className="text-sm font-medium text-brand">{goal.status}</p>
+          <p className="text-sm font-medium text-brand">{STATUS_LABELS[goal.status]}</p>
           <h1 className="mt-2 text-3xl font-semibold sm:text-5xl">{goal.title}</h1>
           {goal.description && (
             <p className="mt-3 max-w-2xl text-secondary-text">{goal.description}</p>
@@ -30,13 +30,17 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ goa
         </div>
         {goal.status !== "ARCHIVED" && (
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Link
-              href={`/goals/${goal.id}/epargne`}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-foreground px-5 text-sm font-medium text-background transition hover:bg-brand hover:text-brand-foreground"
-            >
-              <PiggyBank size={17} aria-hidden="true" />
-              {goal.status === "COMPLETED" ? "Voir les versements" : "Ajouter de l’épargne"}
-            </Link>
+            {goal.status === "PLANNED" ? (
+              <GoalPrimaryAction goalId={goal.id} />
+            ) : (
+              <Link
+                href={`/goals/${goal.id}/epargne`}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-foreground px-5 text-sm font-medium text-background transition hover:bg-brand hover:text-brand-foreground"
+              >
+                <PiggyBank size={17} aria-hidden="true" />
+                {goal.status === "COMPLETED" ? "Voir les versements" : "Ajouter de l’épargne"}
+              </Link>
+            )}
             <Link
               href={`/goals/${goal.id}/modifier`}
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-sm"
@@ -47,6 +51,12 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ goa
           </div>
         )}
       </div>
+      {goal.status === "PLANNED" && (
+        <p className="mt-5 max-w-3xl rounded-2xl border border-brand/25 bg-brand/10 p-4 text-sm leading-6 text-secondary-text">
+          Cette projection suit votre épargne actuelle. En la définissant comme principale, votre
+          plan d’épargne actif basculera automatiquement vers cet objectif.
+        </p>
+      )}
       <section className="mt-10 rounded-3xl border border-border bg-surface p-5 sm:p-8">
         <div className="flex items-end justify-between gap-4">
           <p className="text-3xl font-semibold">{money.format(goal.currentAmount)}</p>
@@ -61,7 +71,7 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ goa
         <Stat icon={Target} label="Montant restant" value={money.format(remaining)} />
         <Stat
           icon={PiggyBank}
-          label="Épargne recommandée"
+          label={goal.isSimulation ? "Estimation mensuelle" : "Épargne recommandée"}
           value={`${money.format(goal.recommendedMonthlySaving)}/mois`}
         />
         <Stat
@@ -78,6 +88,13 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ goa
     </GoalsLayout>
   );
 }
+
+const STATUS_LABELS = {
+  PLANNED: "Objectif planifié",
+  ACTIVE: "Objectif principal",
+  COMPLETED: "Objectif atteint",
+  ARCHIVED: "Objectif archivé",
+} as const;
 
 function Stat({ icon: Icon, label, value }: { icon: typeof Target; label: string; value: string }) {
   return (

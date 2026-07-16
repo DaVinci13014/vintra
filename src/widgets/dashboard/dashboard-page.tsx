@@ -3,6 +3,7 @@ import {
   CircleDollarSign,
   Gauge,
   PiggyBank,
+  Plus,
   ReceiptText,
   Settings,
   Sparkles,
@@ -173,16 +174,78 @@ export function DashboardPage({
         ) : (
           <section className="rounded-3xl border border-dashed border-border bg-surface p-8 text-center">
             <Target className="mx-auto text-brand" />
-            <h2 className="mt-4 text-xl font-semibold">Créez votre premier objectif</h2>
+            <h2 className="mt-4 text-xl font-semibold">
+              {data.plannedGoals.length > 0
+                ? "Choisissez votre objectif principal"
+                : "Créez votre premier objectif"}
+            </h2>
             <p className="mt-2 text-secondary-text">
-              Transformez votre capacité d’épargne en projet concret.
+              {data.plannedGoals.length > 0
+                ? "Activez l’un de vos projets planifiés pour générer votre plan d’épargne."
+                : "Transformez votre capacité d’épargne en projet concret."}
             </p>
             <Link
-              href="/goals/nouveau"
+              href={data.plannedGoals.length > 0 ? "/goals" : "/goals/nouveau"}
               className="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-foreground px-5 text-sm font-medium text-background"
             >
-              Créer un objectif
+              {data.plannedGoals.length > 0 ? "Voir mes objectifs" : "Créer un objectif"}
             </Link>
+          </section>
+        )}
+
+        {data.plannedGoals.length > 0 && (
+          <section aria-labelledby="planned-goals-title">
+            <div className="mb-4 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-brand">À venir</p>
+                <h2 id="planned-goals-title" className="mt-1 text-lg font-semibold">
+                  Autres objectifs
+                </h2>
+              </div>
+              <Link href="/goals" className="text-sm text-brand hover:underline">
+                Tout gérer
+              </Link>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {data.plannedGoals.map((plannedGoal) => (
+                <Link
+                  key={plannedGoal.id}
+                  href={`/goals/${plannedGoal.id}`}
+                  className="rounded-2xl border border-border bg-surface p-5 transition hover:border-brand/40"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-medium text-brand">Planifié</p>
+                      <h3 className="mt-2 font-semibold">{plannedGoal.title}</h3>
+                    </div>
+                    <Target className="shrink-0 text-secondary-text" size={19} aria-hidden="true" />
+                  </div>
+                  <p className="mt-5 text-lg font-semibold">
+                    {money.format(plannedGoal.currentAmount)}
+                  </p>
+                  <p className="mt-1 text-sm text-secondary-text">
+                    sur {money.format(plannedGoal.targetAmount)}
+                  </p>
+                  <div
+                    className="mt-4 h-2 overflow-hidden rounded-full bg-card"
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={Math.round(plannedGoal.progress)}
+                    aria-label={`Progression de ${plannedGoal.title}`}
+                  >
+                    <div
+                      className="h-full rounded-full bg-brand"
+                      style={{ width: `${Math.min(100, plannedGoal.progress)}%` }}
+                    />
+                  </div>
+                  <p className="mt-2 text-xs text-secondary-text">
+                    {Math.round(plannedGoal.progress)} % · Échéance{" "}
+                    {formatDate(plannedGoal.targetDate)}
+                  </p>
+                </Link>
+              ))}
+            </div>
           </section>
         )}
 
@@ -252,9 +315,9 @@ export function DashboardPage({
               href="/settings/profile/finances"
             />
             <ActionLink
-              icon={Target}
-              label={data.goal ? "Modifier mon objectif" : "Créer un objectif"}
-              href={data.goal ? `/goals/${data.goal.id}/modifier` : "/goals/nouveau"}
+              icon={Plus}
+              label={data.goal ? "Ajouter un objectif" : "Créer un objectif"}
+              href="/goals/nouveau"
             />
             <ActionLink
               icon={UserRound}
